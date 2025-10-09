@@ -1,0 +1,34 @@
+[
+  {
+    "id": "term_20250915_214730",
+    "timestamp": "2025-09-15 21:47:30",
+    "user_id": "5946c599-a129-49aa-aeda-72a0b232fc18",
+    "nickname": "김민국",
+    "term_name": "gd",
+    "term_definition": "gd",
+    "category": "🔬 반도체 기술",
+    "related_keywords": "gd",
+    "reference_source": "gd",
+    "additional_notes": "gd",
+    "request_type": "용어학습",
+    "status": "대기중",
+    "admin_notes": ""
+  },
+  {
+    "id": "learning_20250915_214737",
+    "timestamp": "2025-09-15 21:47:37",
+    "user_id": "5946c599-a129-49aa-aeda-72a0b232fc18",
+    "nickname": "김민국",
+    "category": "🔬 반도체 기술",
+    "url_link": "http://localhost:8501/WIKI_%ED%95%99%EC%8A%B5%EC%8B%9C%ED%82%A4%EA%B8%B0",
+    "title": "gd",
+    "description": "gd",
+    "target_bots": [
+      "자료링크"
+    ],
+    "additional_notes": "gd",
+    "request_type": "자료링크",
+    "status": "대기중",
+    "admin_notes": ""
+  }
+]

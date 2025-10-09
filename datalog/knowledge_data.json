@@ -1,0 +1,211 @@
+{
+  "questions": [
+    {
+      "id": "5464f534-2a54-4b1c-8afc-d59a30086944",
+      "title": "gd",
+      "category": "일반",
+      "content": "gd",
+      "author": "김민국",
+      "author_id": "minguk.kim",
+      "timestamp": "2025-09-15 21:47:42"
+    }
+  ],
+  "answers": [
+    {
+      "id": "6e43ed0f-705a-471b-b22b-125c59f4aaed",
+      "question_id": "5464f534-2a54-4b1c-8afc-d59a30086944",
+      "content": "gd",
+      "author": "김민국",
+      "author_id": "minguk.kim",
+      "timestamp": "2025-09-15 21:47:46"
+    }
+  ],
+  "users": {},
+  "likes": {
+    "answer_6e43ed0f-705a-471b-b22b-125c59f4aaed": []
+  },
+  "search_logs": [],
+  "chat_history": [
+    {
+      "timestamp": "2025-09-15 21:47:15",
+      "user_id": "minguk.kim",
+      "username": "김민국",
+      "user_message": "gd",
+      "bot_response": "😔 **죄송합니다!** LLM API가 설정되지 않아 답변을 생성할 수 없습니다.\n\n**해결 방법:**\n1. 관리자에게 LLM API 설정을 요청해주세요\n2. 잠시 후 다시 시도해주세요\n\nℹ️ **참고**: 당신의 질문이 저장되었습니다.",
+      "chatbot_type": "ae_wiki"
+    },
+    {
+      "timestamp": "2025-09-15 21:54:31",
+      "user_id": "minguk.kim",
+      "username": "김민국",
+      "user_message": "gd",
+      "bot_response": "😔 **죄송합니다!** LLM API가 설정되지 않아 답변을 생성할 수 없습니다.\n\n**해결 방법:**\n1. 관리자에게 LLM API 설정을 요청해주세요\n2. 잠시 후 다시 시도해주세요\n\nℹ️ **참고**: 당신의 질문이 저장되었습니다.",
+      "chatbot_type": "ae_wiki"
+    },
+    {
+      "timestamp": "2025-09-30 22:33:03",
+      "user_id": "test",
+      "username": "test",
+      "user_message": "gd",
+      "bot_response": "**🔍 🧠 AE WIKI 응답 (Mock)**\n\n**질문**: gd\n\n**답변**:\n'gd'에 대한 AE팀 업무 관련 정보를 제공드리겠습니다.\n\n**📋 핵심 내용**:\n- 이는 AE팀 업무 프로세스와 관련된 중요한 주제입니다\n- 반도체 제품 개발 및 고객 지원 업무에서 자주 다뤄지는 내용입니다\n- 정확한 절차를 따라 처리하시기 바랍니다\n\n**🔧 실무 적용**:\n- 관련 문서를 참조하여 단계별로 진행하세요\n- 문제 발생 시 팀 내 전문가와 상의하시기 바랍니다\n\n**📚 참고 문서**:\n1. 반도체 제품 개발 프로세스\n2. 메모리 사양 및 테스트 방법\n3. 고객 대응 가이드라인\n\n---\n💡 **시스템 프롬프트 확인됨**: AE팀 기술 Q&A 어시스턴트로 동작 중\n🔄 **Mock 데이터**: 실제 API 연결 시 더 정확한 답변 제공 예정",
+      "chatbot_type": "ae_wiki"
+    }
+  ],
+  "admin_chat_history": [],
+  "user_points": {
+    "Unknown": 200,
+    "김민국": 200,
+    "test": 15,
+    "minguk.kim": 15
+  },
+  "registration_requests": [],
+  "approved_users": {},
+  "glossary_chat_history": [
+    {
+      "timestamp": "2025-09-15 21:47:17",
+      "user_id": "minguk.kim",
+      "username": "김민국",
+      "user_message": "gd",
+      "bot_response": "😔 **죄송합니다!** LLM API가 설정되지 않아 답변을 생성할 수 없습니다.\n\n**해결 방법:**\n1. 관리자에게 LLM API 설정을 요청해주세요\n2. 잠시 후 다시 시도해주세요\n\nℹ️ **참고**: 당신의 질문이 저장되었습니다.",
+      "chatbot_type": "glossary"
+    },
+    {
+      "timestamp": "2025-09-30 22:33:37",
+      "user_id": "test",
+      "username": "test",
+      "user_message": "gd",
+      "bot_response": "**🔍 🔍 AE 용어집 응답 (Mock)**\n\n**용어**: gd\n\n**정의**:\n'gd'는 반도체 기술 분야에서 사용되는 전문 용어입니다.\n\n**📖 상세 설명**:\n- **개념**: 메모리 반도체 및 관련 기술에서 중요한 역할을 하는 용어\n- **분류**: 기술/공정/제품 사양 관련 용어\n- **적용 분야**: DDR 메모리, JEDEC 표준, 반도체 공정\n\n**🔗 관련 용어**:\n- 연관된 기술 용어들과 함께 이해하시면 도움이 됩니다\n- JEDEC 표준 문서에서 공식 정의를 확인할 수 있습니다\n\n**📚 참고 자료**:\n1. **메모리 기술 용어**\n2. **JEDEC 표준 용어**\n3. **업무 전문 용어**\n\n---\n💡 **시스템 프롬프트 확인됨**: 반도체 기술 용어 전문가로 동작 중\n🔄 **Mock 데이터**: 실제 API 연결 시 더 정확한 용어 해설 제공 예정",
+      "chatbot_type": "glossary"
+    }
+  ],
+  "jedec_chat_history": [
+    {
+      "timestamp": "2025-09-15 21:47:24",
+      "user_id": "minguk.kim",
+      "username": "김민국",
+      "user_message": "gd",
+      "bot_response": "😔 **죄송합니다!** LLM API가 설정되지 않아 답변을 생성할 수 없습니다.\n\n**해결 방법:**\n1. 관리자에게 LLM API 설정을 요청해주세요\n2. 잠시 후 다시 시도해주세요\n\nℹ️ **참고**: 당신의 질문이 저장되었습니다.",
+      "chatbot_type": "jedec"
+    }
+  ],
+  "point_logs": [
+    {
+      "username": "Unknown",
+      "points": 100,
+      "activity_type": "용어학습",
+      "timestamp": "2025-09-15 21:47:30",
+      "total_points": 100
+    },
+    {
+      "username": "Unknown",
+      "points": 100,
+      "activity_type": "WIKI학습",
+      "timestamp": "2025-09-15 21:47:37",
+      "total_points": 200
+    },
+    {
+      "username": "김민국",
+      "points": 100,
+      "activity_type": "질문하기",
+      "timestamp": "2025-09-15 21:47:42",
+      "total_points": 100
+    },
+    {
+      "username": "김민국",
+      "points": 100,
+      "activity_type": "답변하기",
+      "timestamp": "2025-09-15 21:47:46",
+      "total_points": 200
+    }
+  ],
+  "point_changes": [
+    {
+      "timestamp": "2025-09-30T23:11:15.520763",
+      "username": "test",
+      "old_points": 0,
+      "new_points": 300,
+      "point_change": 300,
+      "reason": "gd",
+      "admin_user": "test",
+      "change_type": "manual_adjustment"
+    },
+    {
+      "timestamp": "2025-09-30T23:11:24.298862",
+      "username": "minguk.kim",
+      "old_points": 0,
+      "new_points": 10000,
+      "point_change": 10000,
+      "reason": "gd",
+      "admin_user": "test",
+      "change_type": "manual_adjustment"
+    },
+    {
+      "timestamp": "2025-09-30T23:11:28.048841",
+      "username": "minguk.kim",
+      "old_points": 10000,
+      "new_points": 20000,
+      "point_change": 10000,
+      "reason": "gd",
+      "admin_user": "test",
+      "change_type": "manual_adjustment"
+    },
+    {
+      "timestamp": "2025-09-30T23:12:13.968588",
+      "username": "minguk.kim",
+      "old_points": 20000,
+      "new_points": 15,
+      "admin_user": "test",
+      "change_type": "manual_adjustment"
+    },
+    {
+      "timestamp": "2025-09-30T23:12:16.045206",
+      "username": "minguk.kim",
+      "old_points": 15,
+      "new_points": 15,
+      "admin_user": "test",
+      "change_type": "manual_adjustment"
+    },
+    {
+      "timestamp": "2025-09-30T23:12:17.026876",
+      "username": "minguk.kim",
+      "old_points": 15,
+      "new_points": 15,
+      "admin_user": "test",
+      "change_type": "manual_adjustment"
+    },
+    {
+      "timestamp": "2025-09-30T23:12:17.898419",
+      "username": "minguk.kim",
+      "old_points": 15,
+      "new_points": 15,
+      "admin_user": "test",
+      "change_type": "manual_adjustment"
+    },
+    {
+      "timestamp": "2025-09-30T23:17:57.298734",
+      "username": "test",
+      "old_points": 300,
+      "new_points": 315,
+      "point_change": 15,
+      "reason": "d",
+      "admin_user": "test",
+      "change_type": "manual_adjustment"
+    },
+    {
+      "timestamp": "2025-09-30T23:18:12.475507",
+      "username": "minguk.kim",
+      "old_points": 15,
+      "new_points": 15,
+      "admin_user": "test",
+      "change_type": "manual_adjustment"
+    },
+    {
+      "timestamp": "2025-09-30T23:18:17.725191",
+      "username": "test",
+      "old_points": 315,
+      "new_points": 15,
+      "admin_user": "test",
+      "change_type": "manual_adjustment"
+    }
+  ]
+}

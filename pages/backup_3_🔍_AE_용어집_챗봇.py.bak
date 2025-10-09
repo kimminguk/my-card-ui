@@ -1,0 +1,351 @@
+"""
+=================================================================
+📄 AE WIKI - AE 용어집 챗봇 페이지 (3_🔍_AE_용어집_챗봇.py)
+=================================================================
+
+📋 파일 역할:
+- 반도체 AE(Application Engineering) 전문 용어 검색 및 정의 제공 챗봇
+- RAG(Retrieval-Augmented Generation) 기반 신뢰성 높은 용어 검색 시스템
+- 용어 정보 부족 시 "수정하기/추가하기" 기능으로 WIKI 학습시키기 페이지 연동
+
+🔗 주요 컴포넌트:
+- 실시간 용어 검색 채팅 인터페이스
+- "수정하기/추가하기" 버튼 -> WIKI 학습시키기 페이지 자동 리다이렉트
+- 채팅 히스토리 관리 및 초기화 기능
+
+📊 입출력 데이터:
+- 입력: 사용자 용어 검색 질문
+- 출력: 용어 정의, 연관 키워드, 참고 자료
+- 연동: st.session_state로 WIKI 학습시키기 페이지에 컨텍스트 전달
+
+🔄 연동 관계:
+- pages/5_✨WIKI_학습시키기.py: 용어 수정/추가 리다이렉트
+- utils.py: 용어집 전용 챗봇 응답 생성
+- 홈페이지: 🔍 AE 용어집 챗봇 카드에서 접근
+
+⚡ 처리 흐름:
+용어 검색 -> RAG 기반 정보 조회 -> 응답 생성 -> 부족 시 수정/추가 버튼 표시
+-> 버튼 클릭 시 WIKI 학습 페이지로 컨텍스트와 함께 리다이렉트
+"""
+
+import streamlit as st
+import time
+from datetime import datetime
+
+from config import APP_CONFIG, MISC_CONFIG
+from utils import (
+    initialize_data, get_chatbot_response, save_chat_history, load_css_styles,
+    require_login, initialize_session_state
+)
+
+# ====================================
+# 🎨 페이지 설정 및 스타일
+# ====================================
+
+st.set_page_config(
+    page_title=f"AE 용어집 챗봇 - {APP_CONFIG['page_title']}",
+    page_icon="🔍",
+    layout=APP_CONFIG["layout"],
+    initial_sidebar_state=APP_CONFIG["initial_sidebar_state"]
+)
+
+# 다크 테마 적용
+from theme import apply_dark_theme
+apply_dark_theme()
+
+# ====================================
+# 🎯 메인 함수
+# ====================================
+
+def main():
+    # 세션 상태 초기화 및 로그인 상태 복원
+    initialize_session_state()
+    
+    # 로그인 확인
+    if not require_login():
+        return
+    
+    # 데이터 초기화
+    data = initialize_data()
+    
+    # AE 용어집 챗봇 페이지 표시
+    show_glossary_chatbot_page(data)
+
+def show_glossary_chatbot_page(data):
+    """AE 용어집 챗봇 메인 페이지"""
+    
+    # 통합 헤더 및 안내 메시지
+    st.markdown("""
+    <div style="background: linear-gradient(90deg, #28a745 0%, #20c997 100%); 
+               padding: 2rem; border-radius: 15px; color: white; margin-bottom: 2rem; text-align: center;">
+        <h1 style="color: white; text-align: center; margin-bottom: 0.5rem; font-size: 2.5rem;">🔍 AE 용어집 챗봇</h1>
+        <p style="color: #e6fff2; font-size: 1.3rem; margin-bottom: 1.5rem;">반도체 AE 전문 용어 AI 어시스턴트</p>
+        <h4 style="color: white; text-align: center; margin-bottom: 1rem;">🔍 반도체 AE 용어 전문 검색</h4>
+        <p style="margin-bottom: 0.5rem; color: white; text-align: center;">• 반도체 AE 전문 용어 정의 및 설명</p>
+        <p style="margin-bottom: 0.5rem; color: white; text-align: center;">• 기술 용어의 정확한 해석 및 활용법</p>
+        <p style="margin-bottom: 0.5rem; color: white; text-align: center;">• 연관 키워드 및 참고 자료 제공</p>
+        <p style="margin-bottom: 0; color: white; text-align: center;">• 용어 정보 부족 시 학습 요청 기능</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 세션 상태 초기화
+    if "glossary_chat_messages" not in st.session_state:
+        st.session_state.glossary_chat_messages = []
+        # 초기 인사말
+        welcome_message = {
+            "role": "assistant", 
+            "content": """안녕하세요! AE 용어집 전문 챗봇입니다. 🔍
+
+저는 반도체 AE(Application Engineering) 전문 용어 정보를 제공합니다.
+
+**도움을 드릴 수 있는 분야:**
+- 🔬 반도체 AE 전문 용어 정의 및 설명
+- 🎯 기술 용어의 정확한 해석 및 활용법
+- 🔗 연관 키워드 및 참고 자료 제공
+- 📝 용어 정보 부족 시 학습 요청 기능
+- 💡 업무에 필요한 전문 용어 안내
+
+궁금한 반도체 용어가 있으시면 언제든 검색해보세요!
+
+**검색 예시:** "CMOS란?", "DDR5 메모리", "FinFET 기술" 등""",
+            "timestamp": datetime.now().strftime("%H:%M:%S")
+        }
+        st.session_state.glossary_chat_messages.append(welcome_message)
+
+    # 채팅 메시지 표시
+    for message in st.session_state.glossary_chat_messages:
+        with st.chat_message(message["role"]):
+            if message["role"] == "assistant" and message.get("is_last_response"):
+                # 마지막 응답에만 수정/추가 버튼 표시
+                st.markdown(message["content"])
+                st.caption(f"⏰ {message['timestamp']}")
+                
+                # 용어 추가/수정 통합 버튼
+                col1, col2, col3 = st.columns([1, 2, 1])
+                with col2:
+                    if st.button("📝 용어 추가/수정하기", key=f"edit_add_{message['timestamp']}", use_container_width=True):
+                        st.session_state.redirect_context = {
+                            "from_page": "용어집",
+                            "query": st.session_state.get("last_glossary_query", ""),
+                            "response": message["content"],
+                            "action": "edit_or_add"
+                        }
+                        st.switch_page("pages/5_✨WIKI_학습시키기.py")
+            else:
+                st.markdown(message["content"])
+                st.caption(f"⏰ {message['timestamp']}")
+
+    # 채팅 입력 처리
+    if prompt := st.chat_input("궁금한 반도체 용어를 검색해보세요... (예: CMOS란 무엇인가요?)"):
+        # 마지막 쿼리 저장
+        st.session_state.last_glossary_query = prompt
+        
+        # 이전 응답의 is_last_response 플래그 제거
+        for msg in st.session_state.glossary_chat_messages:
+            if "is_last_response" in msg:
+                del msg["is_last_response"]
+        
+        # 사용자 메시지 추가
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        st.session_state.glossary_chat_messages.append({
+            "role": "user", 
+            "content": prompt,
+            "timestamp": timestamp
+        })
+        
+        # 사용자 메시지 표시
+        with st.chat_message("user"):
+            st.markdown(prompt)
+            st.caption(f"⏰ {timestamp}")
+
+        # AI 응답 생성 및 표시
+        with st.chat_message("assistant"):
+            # 응답 생성
+            from utils import get_user_id
+            bot_response = get_chatbot_response(
+                prompt, 
+                chat_history=None,  # 단순화
+                chatbot_type="glossary",
+                user_id=get_user_id()
+            )
+            
+            # AI 응답 표시
+            st.markdown(bot_response)
+            response_timestamp = datetime.now().strftime("%H:%M:%S")
+            st.caption(f"⏰ {response_timestamp}")
+            
+            # 용어 추가/수정 통합 버튼
+            col1, col2, col3 = st.columns([1, 2, 1])
+            with col2:
+                if st.button("📝 용어 추가/수정하기", key=f"edit_add_new_{response_timestamp}", use_container_width=True):
+                    st.session_state.redirect_context = {
+                        "from_page": "용어집",
+                        "query": prompt,
+                        "response": bot_response,
+                        "action": "edit_or_add"
+                    }
+                    st.switch_page("pages/5_✨WIKI_학습시키기.py")
+
+        # AI 응답을 세션 상태에 저장
+        st.session_state.glossary_chat_messages.append({
+            "role": "assistant",
+            "content": bot_response,
+            "timestamp": response_timestamp,
+            "is_last_response": True
+        })
+        
+        # 채팅 히스토리를 knowledge_data.json에 저장
+        save_chat_history(data, prompt, bot_response, chatbot_type="glossary")
+        
+    
+    # 사이드바: 채팅 관리 및 용어 기여 안내
+    with st.sidebar:
+        st.markdown("### 🔧 채팅 관리")
+        
+        if st.button("🗑️ 대화 기록 초기화", use_container_width=True):
+            st.session_state.glossary_chat_messages = []
+            st.success("대화 기록이 초기화되었습니다!")
+            time.sleep(0.5)
+            st.rerun()
+        
+        st.markdown("---")
+        
+        # 용어 기여 안내문 (접을 수 있는 형태)
+        with st.expander("📚 용어 기여 시스템", expanded=False):
+            st.markdown("""
+            <div style="background: linear-gradient(135deg, #e8f5e8 0%, #f0f9ff 100%); 
+                       padding: 1rem; border-radius: 10px; border: 1px solid #10b981; margin-bottom: 1rem;">
+                <h4 style="color: #78350f; margin-bottom: 0.5rem; font-weight: bold;">🌱 나무위키 스타일 기여</h4>
+                <p style="color: #78350f; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                    <strong>📝 용어 추가/수정하기</strong> 버튼을 클릭하면:
+                </p>
+                <ul style="color: #78350f; font-size: 0.85rem; margin-left: 1rem;">
+                    <li>✨ WIKI 학습시키기 페이지로 이동</li>
+                    <li>📋 관리자가 검토 후 승인</li>
+                    <li>📅 등록자와 등록일이 히스토리로 기록</li>
+                    <li>🎁 승인 시 포인트 지급!</li>
+                </ul>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            st.markdown("""
+            <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); 
+                       padding: 1rem; border-radius: 10px; border: 1px solid #f59e0b; margin-bottom: 1rem;">
+                <h4 style="color: #92400e; margin-bottom: 0.5rem;">🏆 기여 혜택</h4>
+                <ul style="color: #78350f; font-size: 0.85rem; margin-left: 1rem;">
+                    <li>🌟 용어 등록: <strong>+10 포인트</strong></li>
+                    <li>🔧 용어 수정: <strong>+5 포인트</strong></li>
+                    <li>👤 기여자명 영구 기록</li>
+                    <li>📊 개인 기여도 통계 제공</li>
+                </ul>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            st.markdown("""
+            <div style="background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); 
+                       padding: 1rem; border-radius: 10px; border: 1px solid #6366f1;">
+                <p style="color: #78350f; font-size: 0.8rem; text-align: center; margin: 0;">
+                    💡 <strong>팁:</strong> 정확하고 유용한 용어일수록<br>
+                    더 많은 포인트를 받을 수 있어요!
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+
+
+def show_edit_add_buttons(response_content, msg_index, timestamp):
+    """수정/추가 버튼 표시"""
+    st.markdown("### 🛠️ 답변 개선하기")
+    
+    # 고유 키 생성을 위해 인덱스와 타임스탬프 사용
+    unique_key_suffix = f"{msg_index}_{timestamp.replace(':', '').replace(' ', '_')}"
+    
+    # 중앙 정렬을 위한 컬럼 구성
+    col1, col2, col3 = st.columns([1, 2, 1])
+    
+    with col2:
+        if st.button("🔧 수정/추가하기", use_container_width=True, key=f"edit_add_{unique_key_suffix}"):
+            # WIKI 학습 페이지의 용어 학습 탭으로 이동
+            st.session_state['redirect_to_wiki_term'] = "edit_add"
+            st.session_state['edit_content'] = response_content
+            st.switch_page("pages/5_✨WIKI_학습시키기.py")
+    
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); 
+               border: 1px solid #42a5f5; padding: 0.8rem; border-radius: 8px; 
+               margin-top: 0.5rem; font-size: 0.9rem; color: #1565c0;">
+        💡 <strong>도움말:</strong> 
+        답변이 부정확하거나 부족한 경우 클릭하여 WIKI에 정보를 수정/추가할 수 있습니다.
+        버튼 클릭 시 WIKI 학습 페이지의 📝 용어 학습시키기 탭으로 이동합니다.
+    </div>
+    """, unsafe_allow_html=True)
+
+def display_text_gradually(text, container):
+    """간단한 타이핑 효과 - 성능 최적화 및 사용자 설정 반영"""
+    # 사용자 설정 확인
+    typing_enabled = st.session_state.get("typing_enabled", True)
+    speed_setting = st.session_state.get("response_speed", "fast")
+    
+    if not typing_enabled or len(text) > 300:  # 타이핑 비활성화 또는 긴 텍스트는 바로 표시
+        container.markdown(text)
+        return
+    
+    # 속도 설정에 따른 딜레이 조정 - 최대한 빠르게
+    speed_delays = {"fast": 0.001, "normal": 0.005, "slow": 0.01}
+    delay = speed_delays.get(speed_setting, 0.001)
+    
+    words = text.split()
+    displayed_text = ""
+    
+    for word in words:
+        displayed_text += word + " "
+        container.markdown(displayed_text)
+        time.sleep(delay * 2)  # 단어 단위
+
+# ====================================
+# 🚀 앱 실행
+# ====================================
+
+def display_glossary_response_with_cards(response_text):
+    """용어집 응답을 확장 가능한 메타데이터 카드로 표시"""
+    # 응답을 파싱해서 메인 내용과 출처/메타데이터 분리
+    lines = response_text.split('\n')
+    main_content = []
+    source_info = []
+    
+    # 출처 섹션 찾기 (--- 또는 📚 **참고 문서** 등)
+    in_sources = False
+    for line in lines:
+        if '---' in line or '📚' in line or '참고 문서' in line or '출처' in line:
+            in_sources = True
+            continue
+        if in_sources:
+            if line.strip():
+                source_info.append(line.strip())
+        else:
+            main_content.append(line)
+    
+    # 메인 내용 표시
+    if main_content:
+        st.markdown('\n'.join(main_content))
+    
+    # 출처 정보가 있으면 확장 가능한 카드로 표시
+    if source_info:
+        with st.expander("📋 상세 메타데이터 및 출처", expanded=False):
+            for i, source in enumerate(source_info, 1):
+                if source.strip():
+                    # 개별 출처를 카드 형태로 표시
+                    with st.container():
+                        st.markdown(f"""
+                        <div style="background-color: #2d3748; border-left: 4px solid #20c997; 
+                                   padding: 1rem; margin: 0.5rem 0; border-radius: 8px;">
+                            <div style="font-weight: bold; color: #20c997; margin-bottom: 0.5rem;">
+                                📄 참고 문서 {i}
+                            </div>
+                            <div style="color: #e1e5e9;">
+                                {source}
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+
+if __name__ == "__main__":
+    main()

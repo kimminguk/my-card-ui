@@ -1,0 +1,88 @@
+{
+  "active_users": {
+    "minguk.kim": {
+      "user_id": "5946c599-a129-49aa-aeda-72a0b232fc18",
+      "nox_id": "minguk.kim",
+      "nickname": "김민국",
+      "name": "김민국",
+      "department": "AE팀",
+      "password": "$2b$12$aT5umMNNoIvPUZEpfoflUuVZ38GE4K9dNKi9jkeMBKwnfi9F5r9u.",
+      "is_active": true,
+      "role": "user",
+      "created_at": "2025-09-15 21:46:58",
+      "last_login": "2025-09-15 21:54:18",
+      "approved_at": "2025-09-15 21:46:58",
+      "approved_by": "Guest"
+    },
+    "test": {
+      "user_id": "de1487a4-9bb3-4d42-9f7c-a24d17381c98",
+      "nox_id": "test",
+      "nickname": "test",
+      "name": "test",
+      "department": "AE팀",
+      "password": "$2b$12$HwAiptWk24KgHh663k/2PuiKxoCXcvFsv6vPFUnMZE7OobArYHfyW",
+      "is_active": true,
+      "role": "user",
+      "created_at": "2025-09-30 22:32:06",
+      "last_login": "2025-10-10 00:59:49",
+      "approved_at": "2025-09-30 22:32:06",
+      "approved_by": "Guest"
+    },
+    "test3": {
+      "user_id": "85badefa-714e-4791-b24c-0384982312c9",
+      "nox_id": "test3",
+      "nickname": "test3",
+      "name": "test3",
+      "department": "AE팀",
+      "password": "$2b$12$GizesE0SZUt3G827WB66fO5J1t0hwJFm1GcfICcv8B7wOk7zu9M6y",
+      "is_active": true,
+      "role": "user",
+      "created_at": "2025-10-10 01:13:53",
+      "last_login": "2025-10-10 01:14:42",
+      "approved_at": "2025-10-10 01:13:53",
+      "approved_by": "Guest"
+    }
+  },
+  "registration_requests": [
+    {
+      "id": "7d2cf3bc-c3b1-43db-aac9-06d9f175ad05",
+      "nox_id": "minguk.kim",
+      "name": "김민국",
+      "department": "AE팀",
+      "password_hash": "$2b$12$aT5umMNNoIvPUZEpfoflUuVZ38GE4K9dNKi9jkeMBKwnfi9F5r9u.",
+      "status": "approved",
+      "requested_at": "2025-09-15T21:46:52.261248",
+      "processed_at": "2025-09-15T21:46:58.908909",
+      "processed_by": "Guest"
+    },
+    {
+      "id": "290cb01f-9326-4000-84f6-bb0516259510",
+      "nox_id": "test",
+      "name": "test",
+      "department": "AE팀",
+      "password_hash": "$2b$12$HwAiptWk24KgHh663k/2PuiKxoCXcvFsv6vPFUnMZE7OobArYHfyW",
+      "status": "approved",
+      "requested_at": "2025-09-30T22:32:02.766781",
+      "processed_at": "2025-09-30T22:32:06.037335",
+      "processed_by": "Guest"
+    },
+    {
+      "id": "43ecd149-7406-42ba-ab30-8f9399e6edd1",
+      "nox_id": "test3",
+      "name": "test3",
+      "department": "AE팀",
+      "password_hash": "$2b$12$GizesE0SZUt3G827WB66fO5J1t0hwJFm1GcfICcv8B7wOk7zu9M6y",
+      "status": "approved",
+      "requested_at": "2025-10-10T01:13:49.940314",
+      "processed_at": "2025-10-10T01:13:53.025810",
+      "processed_by": "Guest"
+    }
+  ],
+  "sessions": {},
+  "login_attempts": {},
+  "metadata": {
+    "version": "1.0",
+    "last_updated": "2025-10-10T01:14:42.419142",
+    "description": "통합 사용자 관리 시스템"
+  }
+}

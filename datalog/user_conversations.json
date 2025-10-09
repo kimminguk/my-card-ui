@@ -1,0 +1,81 @@
+{
+  "version": "1.0",
+  "created_at": "2025-09-15T21:54:31.797347",
+  "conversations": {
+    "minguk.kim": [
+      {
+        "id": "conv_1757940871_5272cbf3",
+        "timestamp": "2025-09-15T21:54:31.810479",
+        "user_message": "gd",
+        "bot_response": "😔 **죄송합니다!** LLM API가 설정되지 않아 답변을 생성할 수 없습니다.\n\n**해결 방법:**\n1. 관리자에게 LLM API 설정을 요청해주세요\n2. 잠시 후 다시 시도해주세요\n\nℹ️ **참고**: 당신의 질문이 저장되었습니다.",
+        "conversation_type": "ae_wiki",
+        "metadata": {
+          "username": "김민국",
+          "via_legacy_save": true,
+          "chatbot_type": "ae_wiki"
+        },
+        "message_count": 2
+      },
+      {
+        "id": "conv_1757940871_3aac99c8",
+        "timestamp": "2025-09-15T21:54:31.798445",
+        "user_message": "gd",
+        "bot_response": "😔 **죄송합니다!** LLM API가 설정되지 않아 답변을 생성할 수 없습니다.\n\n**해결 방법:**\n1. 관리자에게 LLM API 설정을 요청해주세요\n2. 잠시 후 다시 시도해주세요\n\nℹ️ **참고**: 당신의 질문이 저장되었습니다.",
+        "conversation_type": "ae_wiki",
+        "metadata": {},
+        "message_count": 2
+      }
+    ],
+    "test": [
+      {
+        "id": "conv_1759239183_15ea29be",
+        "timestamp": "2025-09-30T22:33:03.485239",
+        "user_message": "gd",
+        "bot_response": "**🔍 🧠 AE WIKI 응답 (Mock)**\n\n**질문**: gd\n\n**답변**:\n'gd'에 대한 AE팀 업무 관련 정보를 제공드리겠습니다.\n\n**📋 핵심 내용**:\n- 이는 AE팀 업무 프로세스와 관련된 중요한 주제입니다\n- 반도체 제품 개발 및 고객 지원 업무에서 자주 다뤄지는 내용입니다\n- 정확한 절차를 따라 처리하시기 바랍니다\n\n**🔧 실무 적용**:\n- 관련 문서를 참조하여 단계별로 진행하세요\n- 문제 발생 시 팀 내 전문가와 상의하시기 바랍니다\n\n**📚 참고 문서**:\n1. 반도체 제품 개발 프로세스\n2. 메모리 사양 및 테스트 방법\n3. 고객 대응 가이드라인\n\n---\n💡 **시스템 프롬프트 확인됨**: AE팀 기술 Q&A 어시스턴트로 동작 중\n🔄 **Mock 데이터**: 실제 API 연결 시 더 정확한 답변 제공 예정",
+        "conversation_type": "ae_wiki",
+        "metadata": {},
+        "message_count": 2
+      },
+      {
+        "id": "conv_1759239183_799052a6",
+        "timestamp": "2025-09-30T22:33:03.487303",
+        "user_message": "gd",
+        "bot_response": "**🔍 🧠 AE WIKI 응답 (Mock)**\n\n**질문**: gd\n\n**답변**:\n'gd'에 대한 AE팀 업무 관련 정보를 제공드리겠습니다.\n\n**📋 핵심 내용**:\n- 이는 AE팀 업무 프로세스와 관련된 중요한 주제입니다\n- 반도체 제품 개발 및 고객 지원 업무에서 자주 다뤄지는 내용입니다\n- 정확한 절차를 따라 처리하시기 바랍니다\n\n**🔧 실무 적용**:\n- 관련 문서를 참조하여 단계별로 진행하세요\n- 문제 발생 시 팀 내 전문가와 상의하시기 바랍니다\n\n**📚 참고 문서**:\n1. 반도체 제품 개발 프로세스\n2. 메모리 사양 및 테스트 방법\n3. 고객 대응 가이드라인\n\n---\n💡 **시스템 프롬프트 확인됨**: AE팀 기술 Q&A 어시스턴트로 동작 중\n🔄 **Mock 데이터**: 실제 API 연결 시 더 정확한 답변 제공 예정",
+        "conversation_type": "ae_wiki",
+        "metadata": {
+          "username": "test",
+          "via_legacy_save": true,
+          "chatbot_type": "ae_wiki"
+        },
+        "message_count": 2
+      },
+      {
+        "id": "conv_1759239217_91422ae6",
+        "timestamp": "2025-09-30T22:33:37.480693",
+        "user_message": "gd",
+        "bot_response": "**🔍 🔍 AE 용어집 응답 (Mock)**\n\n**용어**: gd\n\n**정의**:\n'gd'는 반도체 기술 분야에서 사용되는 전문 용어입니다.\n\n**📖 상세 설명**:\n- **개념**: 메모리 반도체 및 관련 기술에서 중요한 역할을 하는 용어\n- **분류**: 기술/공정/제품 사양 관련 용어\n- **적용 분야**: DDR 메모리, JEDEC 표준, 반도체 공정\n\n**🔗 관련 용어**:\n- 연관된 기술 용어들과 함께 이해하시면 도움이 됩니다\n- JEDEC 표준 문서에서 공식 정의를 확인할 수 있습니다\n\n**📚 참고 자료**:\n1. **메모리 기술 용어**\n2. **JEDEC 표준 용어**\n3. **업무 전문 용어**\n\n---\n💡 **시스템 프롬프트 확인됨**: 반도체 기술 용어 전문가로 동작 중\n🔄 **Mock 데이터**: 실제 API 연결 시 더 정확한 용어 해설 제공 예정",
+        "conversation_type": "glossary",
+        "metadata": {},
+        "message_count": 2
+      },
+      {
+        "id": "conv_1759239217_ab04b3e0",
+        "timestamp": "2025-09-30T22:33:37.491955",
+        "user_message": "gd",
+        "bot_response": "**🔍 🔍 AE 용어집 응답 (Mock)**\n\n**용어**: gd\n\n**정의**:\n'gd'는 반도체 기술 분야에서 사용되는 전문 용어입니다.\n\n**📖 상세 설명**:\n- **개념**: 메모리 반도체 및 관련 기술에서 중요한 역할을 하는 용어\n- **분류**: 기술/공정/제품 사양 관련 용어\n- **적용 분야**: DDR 메모리, JEDEC 표준, 반도체 공정\n\n**🔗 관련 용어**:\n- 연관된 기술 용어들과 함께 이해하시면 도움이 됩니다\n- JEDEC 표준 문서에서 공식 정의를 확인할 수 있습니다\n\n**📚 참고 자료**:\n1. **메모리 기술 용어**\n2. **JEDEC 표준 용어**\n3. **업무 전문 용어**\n\n---\n💡 **시스템 프롬프트 확인됨**: 반도체 기술 용어 전문가로 동작 중\n🔄 **Mock 데이터**: 실제 API 연결 시 더 정확한 용어 해설 제공 예정",
+        "conversation_type": "glossary",
+        "metadata": {
+          "username": "test",
+          "via_legacy_save": true,
+          "chatbot_type": "glossary"
+        },
+        "message_count": 2
+      }
+    ]
+  },
+  "metadata": {
+    "window_size": 5,
+    "auto_cleanup": true
+  },
+  "last_updated": "2025-09-30T22:33:37.500040"
+}
