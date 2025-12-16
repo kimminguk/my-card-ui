@@ -75,7 +75,7 @@ try:
         get_user_id,
         get_username,
         get_display_name,
-        get_nox_id,
+        get_knox_id,
         check_admin,
         login_admin,
         logout_admin,
@@ -101,8 +101,6 @@ except ImportError as e:
 try:
     from api_manager import (
         call_llm_api,
-        get_mock_rag_response,
-        get_mock_llm_response,
         call_rag_api_with_chatbot_type,
         format_source_citations
     )
@@ -132,8 +130,61 @@ try:
     logger.info("채팅 관리 모듈 로드 완료")
 except ImportError as e:
     logger.error(f"채팅 관리 모듈 로드 실패: {e}")
-    def save_chat_history(*args, **kwargs):
-        pass
+    def save_chat_history(
+        data,
+        user_message,
+        bot_response,
+        chatbot_type="ae_wiki",
+        user_id=None,
+        **kwargs
+    ):
+        """
+        통합 대화 로그 저장.
+        - user_id: Knox ID 권장 (없으면 자동 추정)
+        - chatbot_type: ae_wiki / glossary / jedec / tripmate / lab ...
+        """
+        from datetime import datetime
+
+        # Knox ID가 없으면 시스템에서 추정
+        try:
+            from utils import get_username
+            resolved_user = user_id or get_username() or "anonymous"
+        except Exception:
+            resolved_user = user_id or "anonymous"
+
+        entry = {
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "user_id": resolved_user,
+            "user_message": str(user_message),
+            "bot_response": str(bot_response),
+            "chatbot_type": chatbot_type,
+        }
+
+        # 통합 로그 저장
+        data.setdefault("chat_history", []).append(entry)
+
+        # (선택) 챗봇별 별도 리스트도 병행 유지
+        per_bot_key_map = {
+            "ae_wiki": "ae_wiki_chat_history",
+            "glossary": "glossary_chat_history",
+            "jedec": "jedec_chat_history",
+            "tripmate": "tripmate_chat_history",
+            "lab": "lab_chat_history",
+        }
+
+        per_key = per_bot_key_map.get(chatbot_type)
+        if per_key:
+            data.setdefault(per_key, []).append(entry)
+
+        # 저장
+        try:
+            from utils import save_data as _save
+            _save(data)
+        except Exception:
+            pass  # 저장 오류 시 무시 (앱 죽지 않게)
+
+        return entry
+
     def log_search(*args, **kwargs):
         pass
 
@@ -360,13 +411,13 @@ def cleanup_duplicate_points_data(data, method: str = "keep_current") -> bool:
 
         user_points = data.get("user_points", {})
         users_list = get_all_users()
-        user_dict = {user.get("nox_id", user.get("user_id", "")): user for user in users_list}
+        user_dict = {user.get("knox_id", user.get("user_id", "")): user for user in users_list}
 
         # 중복 데이터 찾기
         duplicates_found = []
         for username in list(user_points.keys()):
-            # nox_id가 아닌 경우 (레거시 이름 기반)
-            if username not in [user.get("nox_id", "") for user in users_list]:
+            # knox_id가 아닌 경우 (레거시 이름 기반)
+            if username not in [user.get("knox_id", "") for user in users_list]:
                 # 실제 사용자 이름과 매칭되는지 확인
                 matching_user = None
                 for user in users_list:
@@ -374,9 +425,9 @@ def cleanup_duplicate_points_data(data, method: str = "keep_current") -> bool:
                         matching_user = user
                         break
 
-                if matching_user and matching_user.get("nox_id") in user_points:
+                if matching_user and matching_user.get("knox_id") in user_points:
                     legacy_key = username
-                    current_key = matching_user.get("nox_id")
+                    current_key = matching_user.get("knox_id")
                     legacy_points = user_points.get(legacy_key, 0)
                     current_points = user_points.get(current_key, 0)
 
@@ -420,20 +471,33 @@ def cleanup_duplicate_points_data(data, method: str = "keep_current") -> bool:
 # ====================================
 # 🔧 사용자 관리 함수들
 # ====================================
-def validate_nox_id(nox_id: str):
-    """NOX ID 유효성 검사"""
-    from auth_manager import validate_nox_id as auth_validate_nox_id
-    return auth_validate_nox_id(nox_id)
+def validate_knox_id(knox_id: str):
+    """Knox ID 유효성 검사"""
+    if not knox_id or len(knox_id.strip()) == 0:
+        return False, "Knox ID를 입력해주세요."
+    if len(knox_id) < 3:
+        return False, "Knox ID는 최소 3자 이상이어야 합니다."
+    if not knox_id.replace("_", "").replace("-", "").replace(".", "").isalnum():
+        return False, "Knox ID는 영문자, 숫자, _, -, . 만 사용 가능합니다."
+    return True, "유효한 Knox ID입니다."
 
 def validate_nickname(nickname: str):
     """닉네임 유효성 검사"""
-    from auth_manager import validate_nickname as auth_validate_nickname
-    return auth_validate_nickname(nickname)
+    if not nickname or len(nickname.strip()) == 0:
+        return False, "닉네임을 입력해주세요."
+    if len(nickname) < 2:
+        return False, "닉네임은 최소 2자 이상이어야 합니다."
+    if len(nickname) > 20:
+        return False, "닉네임은 최대 20자까지 가능합니다."
+    return True, "유효한 닉네임입니다."
 
 def validate_department(department: str):
     """부서 유효성 검사"""
-    from auth_manager import validate_department as auth_validate_department
-    return auth_validate_department(department)
+    if not department or len(department.strip()) == 0:
+        return False, "부서를 입력해주세요."
+    if len(department) < 2:
+        return False, "부서명은 최소 2자 이상이어야 합니다."
+    return True, "유효한 부서명입니다."
 
 def get_all_users():
     """모든 사용자 조회 (user_manager.py의 active_users 사용)"""
@@ -445,12 +509,12 @@ def get_all_users():
 
         # 딕셔너리의 값들을 리스트로 변환
         users_list = []
-        for nox_id, user_data in active_users_dict.items():
+        for knox_id, user_data in active_users_dict.items():
             # 리스트 형식으로 변환 (하위 호환성을 위해)
             user_dict = {
                 "user_id": user_data.get("user_id", ""),
-                "nox_id": nox_id,
-                "username": nox_id,  # 호환성
+                "knox_id": knox_id,
+                "username": knox_id,  # 호환성
                 "nickname": user_data.get("nickname", user_data.get("name", "")),
                 "name": user_data.get("name", ""),
                 "department": user_data.get("department", ""),
@@ -479,7 +543,7 @@ def search_users(keyword: str = ""):
         for user in users:
             if (keyword in user.get("username", "").lower() or
                 keyword in user.get("nickname", "").lower() or
-                keyword in user.get("nox_id", "").lower() or
+                keyword in user.get("knox_id", "").lower() or
                 keyword in user.get("department", "").lower()):
                 filtered_users.append(user)
 
@@ -497,13 +561,13 @@ def toggle_user_status(user_id: str) -> bool:
         active_users = users_data.get("active_users", {})
 
         # user_id로 사용자 찾기
-        for nox_id, user_data in active_users.items():
+        for knox_id, user_data in active_users.items():
             if user_data.get("user_id") == user_id:
                 # is_active 상태 토글
                 current_status = user_data.get("is_active", True)
                 user_data["is_active"] = not current_status
                 save_user_mgr_data(users_data)
-                logger.info(f"사용자 상태 토글: {nox_id} -> {user_data['is_active']}")
+                logger.info(f"사용자 상태 토글: {knox_id} -> {user_data['is_active']}")
                 return True
 
         logger.warning(f"사용자를 찾을 수 없음: user_id={user_id}")
@@ -522,16 +586,16 @@ def delete_user(user_id: str) -> bool:
         active_users = users_data.get("active_users", {})
 
         # user_id로 사용자 찾아서 삭제
-        nox_id_to_delete = None
-        for nox_id, user_data in active_users.items():
+        knox_id_to_delete = None
+        for knox_id, user_data in active_users.items():
             if user_data.get("user_id") == user_id:
-                nox_id_to_delete = nox_id
+                knox_id_to_delete = knox_id
                 break
 
-        if nox_id_to_delete:
-            del active_users[nox_id_to_delete]
+        if knox_id_to_delete:
+            del active_users[knox_id_to_delete]
             save_user_mgr_data(users_data)
-            logger.info(f"사용자 삭제: {nox_id_to_delete}")
+            logger.info(f"사용자 삭제: {knox_id_to_delete}")
             return True
 
         logger.warning(f"삭제할 사용자를 찾을 수 없음: user_id={user_id}")
@@ -550,12 +614,12 @@ def update_user_info(user_id: str, nickname: str, department: str):
         active_users = users_data.get("active_users", {})
 
         # user_id로 사용자 찾아서 수정
-        for nox_id, user_data in active_users.items():
+        for knox_id, user_data in active_users.items():
             if user_data.get("user_id") == user_id:
                 user_data["nickname"] = nickname
                 user_data["department"] = department
                 save_user_mgr_data(users_data)
-                logger.info(f"사용자 정보 수정: {nox_id} - {nickname}, {department}")
+                logger.info(f"사용자 정보 수정: {knox_id} - {nickname}, {department}")
                 return True, "사용자 정보가 수정되었습니다."
 
         logger.warning(f"수정할 사용자를 찾을 수 없음: user_id={user_id}")
@@ -569,5 +633,46 @@ def update_user_info(user_id: str, nickname: str, department: str):
 def submit_registration_request_legacy(username: str, name: str, department: str, password: str):
     """레거시 등록 요청 함수"""
     return submit_registration_request(username, name, department, password)
+
+# ===============================================================
+# 👤 사용자 표시용 ID/닉네임 변환 유틸 (로그/랭킹 공용)
+# ===============================================================
+
+def resolve_user_label(user_key: str) -> str:
+    """
+    저장 데이터에 쓰이는 사용자 키(예: knox_id / username / user_id / 세션UUID)를
+    화면 표시용 닉네임(없으면 실명, 없으면 원래 키)으로 변환한다.
+    """
+    try:
+        from utils import get_all_users  # self-import 회피
+        users = get_all_users()
+    except Exception:
+        return user_key or "Unknown"
+
+    for u in users:
+        if user_key in (u.get("knox_id"), u.get("username"),
+                        u.get("user_id"), u.get("name")):
+            return u.get("nickname") or u.get("name") or \
+                   u.get("knox_id") or user_key
+
+    return user_key or "Unknown"
+
+def resolve_to_knox_id(user_key: str) -> str:
+    """
+    저장 키를 Knox ID(회사 계정 ID)로 변환.
+    일치하는 사용자가 없으면 원래 값을 그대로 반환한다.
+    """
+    try:
+        from utils import get_all_users
+        users = get_all_users()
+    except Exception:
+        return user_key or "Unknown"
+
+    for u in users:
+        if user_key in (u.get("knox_id"), u.get("username"),
+                        u.get("user_id"), u.get("name")):
+            return u.get("knox_id") or user_key
+
+    return user_key or "Unknown"
 
 logger.info("Utils 모듈 로드 완료")

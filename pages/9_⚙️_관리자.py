@@ -338,7 +338,7 @@ def show_user_card(user, index):
         col1, col2, col3 = st.columns([6, 2, 2])
         
         with col1:
-            st.markdown(f"**{index}. {status_color} {user['nickname']}** `({user['nox_id']})`")
+            st.markdown(f"**{index}. {status_color} {user['nickname']}** `({user['knox_id']})`")
         
         with col2:
             st.markdown(f"**{user['department']}**")
@@ -469,7 +469,7 @@ def download_user_list():
     df_data = []
     for user in users:
         df_data.append({
-            "녹스아이디": user["nox_id"],
+            "녹스아이디": user["knox_id"],
             "닉네임": user["nickname"], 
             "소속부서": user["department"],
             "등록일": user["created_at"].split()[0],
@@ -1194,13 +1194,13 @@ def show_registration_approval(data):
             st.info(f"📋 승인 대기 중인 회원가입 신청: **{len(pending_requests)}**건")
             
             for req in pending_requests:
-                with st.expander(f"🆕 {req['name']} ({req['nox_id']}) - {req['department']}", expanded=True):
+                with st.expander(f"🆕 {req['name']} ({req['knox_id']}) - {req['department']}", expanded=True):
                     # 신청자 정보 표시
                     col1, col2 = st.columns(2)
                     
                     with col1:
                         st.markdown("**📋 신청자 정보**")
-                        st.markdown(f"**녹스아이디**: {req['nox_id']}")
+                        st.markdown(f"**녹스아이디**: {req['knox_id']}")
                         st.markdown(f"**실명**: {req['name']}")
                         st.markdown(f"**소속부서**: {req['department']}")
                         st.markdown(f"**신청일시**: {req['requested_at'][:19].replace('T', ' ')}")
@@ -1210,7 +1210,7 @@ def show_registration_approval(data):
                         
                         # 승인 버튼
                         if st.button(
-                            f"✅ {req['nox_id']} 승인", 
+                            f"✅ {req['knox_id']} 승인", 
                             key=f"approve_{req['id']}", 
                             type="primary",
                             use_container_width=True
@@ -1234,7 +1234,7 @@ def show_registration_approval(data):
                             )
                             
                             if st.form_submit_button(
-                                f"❌ {req['nox_id']} 거절", 
+                                f"❌ {req['knox_id']} 거절", 
                                 type="secondary",
                                 use_container_width=True
                             ):
@@ -1270,7 +1270,7 @@ def show_registration_approval(data):
                 status_emoji = "✅" if req["status"] == "approved" else "❌"
                 table_data.append({
                     "상태": f"{status_emoji} {req['status'].upper()}",
-                    "녹스아이디": req["nox_id"],
+                    "녹스아이디": req["knox_id"],
                     "실명": req["name"],
                     "부서": req["department"],
                     "신청일": req["requested_at"][:10],
@@ -1345,7 +1345,7 @@ def show_points_overview(data, all_points):
 
     # 사용자 정보와 포인트 결합
     users_list = get_all_users()
-    user_dict = {user.get("nox_id", user.get("user_id", "")): user for user in users_list}
+    user_dict = {user.get("knox_id", user.get("user_id", "")): user for user in users_list}
 
     # 테이블 데이터 생성
     table_data = []
@@ -1404,8 +1404,8 @@ def show_points_adjustment(data):
         return
 
     user_options = {
-        f"{user.get('nickname', user.get('name', 'Unknown'))} ({user.get('nox_id', user.get('user_id', ''))})"
-        : user.get('nox_id', user.get('user_id', ''))
+        f"{user.get('nickname', user.get('name', 'Unknown'))} ({user.get('knox_id', user.get('user_id', ''))})"
+        : user.get('knox_id', user.get('user_id', ''))
         for user in users_list
     }
 
@@ -1493,7 +1493,7 @@ def show_points_history(data):
         # 사용자 필터
         users_list = get_all_users()
         user_options = ["전체"] + [
-            user.get('nox_id', user.get('user_id', ''))
+            user.get('knox_id', user.get('user_id', ''))
             for user in users_list
         ]
         selected_user = st.selectbox("사용자 필터:", user_options, key="history_user_filter")
@@ -1550,7 +1550,7 @@ def show_points_data_cleanup(data):
     # 중복 데이터 검사
     all_points = get_all_user_points(data)
     users_list = get_all_users()
-    user_dict = {user.get("nox_id", user.get("user_id", "")): user for user in users_list}
+    user_dict = {user.get("knox_id", user.get("user_id", "")): user for user in users_list}
 
     # 중복 가능성 분석
     duplicates_found = []
@@ -1558,7 +1558,7 @@ def show_points_data_cleanup(data):
 
     for username in all_points.keys():
         # nox_id가 아닌 경우 (레거시 이름 기반)
-        if username not in [user.get("nox_id", "") for user in users_list]:
+        if username not in [user.get("knox_id", "") for user in users_list]:
             # 실제 사용자 이름과 매칭되는지 확인
             matching_user = None
             for user in users_list:
@@ -1566,14 +1566,14 @@ def show_points_data_cleanup(data):
                     matching_user = user
                     break
 
-            if matching_user and matching_user.get("nox_id") in all_points:
+            if matching_user and matching_user.get("knox_id") in all_points:
                 legacy_points = all_points.get(username, 0)
-                current_points = all_points.get(matching_user.get("nox_id"), 0)
+                current_points = all_points.get(matching_user.get("knox_id"), 0)
 
                 duplicates_found.append({
                     "legacy_key": username,
                     "legacy_points": legacy_points,
-                    "current_key": matching_user.get("nox_id"),
+                    "current_key": matching_user.get("knox_id"),
                     "current_points": current_points,
                     "user_info": matching_user
                 })
@@ -1602,7 +1602,7 @@ def show_points_data_cleanup(data):
                 col_info1, col_info2 = st.columns(2)
                 with col_info1:
                     st.write(f"이름: {dup['user_info'].get('name', '-')}")
-                    st.write(f"ID: {dup['user_info'].get('nox_id', '-')}")
+                    st.write(f"ID: {dup['user_info'].get('knox_id', '-')}")
                 with col_info2:
                     st.write(f"닉네임: {dup['user_info'].get('nickname', '-')}")
                     st.write(f"부서: {dup['user_info'].get('department', '-')}")
