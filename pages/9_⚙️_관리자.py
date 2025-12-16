@@ -8,6 +8,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 import json
 import os
+import io
 
 from config import APP_CONFIG, DATA_CONFIG, AUTH_CONFIG
 from utils import (
@@ -802,32 +803,67 @@ def filter_search_logs(logs, date_filter, keyword_filter):
     return filtered
 
 def download_search_logs_excel(logs):
-    """검색 로그 Excel 다운로드"""
+    """검색 로그 Excel 다운로드 (브라우저에서 바로)"""
     df = pd.DataFrame(logs)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"search_logs_{timestamp}.xlsx"
     
-    # Excel 파일로 저장
-    df.to_excel(filename, index=False)
-    st.success(f"📥 {filename} 파일이 다운로드되었습니다.")
+    # 엑셀을 메모리에 쓰기
+    buffer = io.BytesIO()
+    with pd.ExcelWriter(buffer, engine="xlsxwriter") as writer:
+        df.to_excel(writer, index=False, sheet_name="SearchLogs")
+        buffer.seek(0)
+    
+    # 브라우저 다운로드
+    st.download_button(
+        label="📥 검색 로그 다운로드",
+        data=buffer,
+        file_name=filename,
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        use_container_width=True
+    )
 
 def download_chat_logs_excel(chats, chat_type):
-    """챗봇 로그 Excel 다운로드"""
+    """챗봇 로그 Excel 다운로드 (브라우저에서 바로)"""
     df = pd.DataFrame(chats)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"{chat_type}_logs_{timestamp}.xlsx"
     
-    df.to_excel(filename, index=False)
-    st.success(f"📥 {filename} 파일이 다운로드되었습니다.")
+    # 엑셀을 메모리에 쓰기
+    buffer = io.BytesIO()
+    with pd.ExcelWriter(buffer, engine="xlsxwriter") as writer:
+        df.to_excel(writer, index=False, sheet_name="ChatLogs")
+        buffer.seek(0)
+    
+    # 브라우저 다운로드
+    st.download_button(
+        label="📥 대화 로그 다운로드",
+        data=buffer,
+        file_name=filename,
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        use_container_width=True
+    )
 
 def download_activity_logs_excel(activities):
-    """활동 로그 Excel 다운로드"""
+    """활동 로그 Excel 다운로드 (브라우저에서 바로)"""
     df = pd.DataFrame(activities)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"activity_logs_{timestamp}.xlsx"
     
-    df.to_excel(filename, index=False)
-    st.success(f"📥 {filename} 파일이 다운로드되었습니다.")
+    # 엑셀을 메모리에 쓰기
+    buffer = io.BytesIO()
+    with pd.ExcelWriter(buffer, engine="xlsxwriter") as writer:
+        df.to_excel(writer, index=False, sheet_name="ActivityLogs")
+        buffer.seek(0)
+    
+    # 브라우저 다운로드
+    st.download_button(
+        label="📥 활동 로그 다운로드",
+        data=buffer,
+        file_name=filename,
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        use_container_width=True
+    )
 
 def cleanup_old_chats(data, days_old):
     """오래된 대화 삭제"""

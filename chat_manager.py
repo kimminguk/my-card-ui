@@ -37,7 +37,7 @@ def save_chat_history(data: Dict, user_message: str, bot_response: str, chatbot_
     🔄 처리 흐름:
     1. 사용자 정보 확인
     2. 채팅 기록 구조화
-    3. 슬라이딩 윈도우 적용 (최대 100개 대화)
+    3. 슬라이딩 윈도우 적용 (최대 500개 대화)
     4. 데이터 저장
     """
 
@@ -70,11 +70,11 @@ def save_chat_history(data: Dict, user_message: str, bot_response: str, chatbot_
 
         data["chat_history"].append(chat_entry)
 
-        # STEP 4: 슬라이딩 윈도우 적용 (최대 100개 대화 유지)
+        # STEP 4: 슬라이딩 윈도우 적용 (최대 500개 대화 유지)
         # 메모리 효율성을 위해 오래된 채팅 기록 자동 삭제
-        max_chat_history = 100
+        max_chat_history = 500
         if len(data["chat_history"]) > max_chat_history:
-            # 최신 100개만 유지
+            # 최신 500개만 유지
             data["chat_history"] = data["chat_history"][-max_chat_history:]
             logger.info(f"채팅 기록 슬라이딩 윈도우 적용: {max_chat_history}개로 제한")
 
