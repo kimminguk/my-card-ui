@@ -85,7 +85,7 @@ def simple_login(username: str, password: str) -> Tuple[bool, str, dict]:
             return True, message, {
                 'username': username,
                 'name': user_data.get('name', user_data.get('nickname', username)),
-                'nox_id': user_data.get('nox_id', username),
+                'knox_id': user_data.get('knox_id', username),
                 'department': user_data.get('department', 'Unknown'),
                 'user_id': user_data.get('user_id'),
                 'nickname': user_data.get('nickname', user_data.get('name', username)),
@@ -149,17 +149,17 @@ def setup_session_after_login(username: str, name: str):
         from user_manager import get_active_user
         user_info = get_active_user(username)
         if user_info:
-            st.session_state["auth_nox_id"] = user_info.get("nox_id", username)
+            st.session_state["auth_knox_id"] = user_info.get("knox_id", username)
             st.session_state["auth_department"] = user_info.get("department", "기타")
             logger.info(f"사용자 {username}({name}) 로그인 성공 - 세션 정보 설정 완료")
         else:
             # 기본 정보로 설정
-            st.session_state["auth_nox_id"] = username
+            st.session_state["auth_knox_id"] = username
             st.session_state["auth_department"] = "기타"
             logger.warning(f"사용자 {username}의 추가 정보를 찾을 수 없음")
     except Exception as e:
         # 오류 발생 시 기본 로그인은 유지
-        st.session_state["auth_nox_id"] = username
+        st.session_state["auth_knox_id"] = username
         st.session_state["auth_department"] = "기타"
         logger.warning(f"사용자 {username}의 추가 정보 로드 실패: {e}")
 
@@ -178,7 +178,7 @@ def logout_user() -> None:
         del st.session_state["logged_in"]
 
     # 포인트 시스템 연동 세션 정리
-    auth_keys = ["auth_user", "auth_name", "auth_nox_id", "auth_department"]
+    auth_keys = ["auth_user", "auth_name", "auth_knox_id", "auth_department"]
     for key in auth_keys:
         if key in st.session_state:
             del st.session_state[key]
@@ -278,7 +278,7 @@ def get_current_user() -> Optional[Dict]:
         if user_info:
             return {
                 "user_id": user_info.get('user_id', auth_user),
-                "nox_id": user_info.get('nox_id', auth_user),
+                "knox_id": user_info.get('knox_id', auth_user),
                 "nickname": user_info.get('nickname', auth_name),
                 "department": user_info.get('department', 'Unknown'),
                 "role": user_info.get('role', 'user')
@@ -289,7 +289,7 @@ def get_current_user() -> Optional[Dict]:
     # 폴백: 기본 정보만 반환
     return {
         "user_id": auth_user,
-        "nox_id": auth_user,
+        "knox_id": auth_user,
         "nickname": auth_name,
         "department": "Unknown",
         "role": "user"
@@ -332,14 +332,14 @@ def get_display_name(user=None) -> str:
     else:
         return get_username()
 
-def get_nox_id() -> str:
+def get_knox_id() -> str:
     """
     현재 사용자의 NOX ID 반환
 
     Returns:
         str: NOX ID (미로그인 시 "unknown")
     """
-    return st.session_state.get("auth_nox_id", "unknown")
+    return st.session_state.get("auth_knox_id", "unknown")
 
 # ====================================
 # 👨‍💼 관리자 인증

@@ -21,7 +21,7 @@ APP_CONFIG = {
 
 # 📁 로컬 데이터 파일 경로 설정
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-DATA_FOLDER = os.path.join(PROJECT_ROOT, "datalog")
+DATA_FOLDER = os.path.join(PROJECT_ROOT, "/config/work/sharedworkspace")
 os.makedirs(DATA_FOLDER, exist_ok=True)
 
 DATA_CONFIG = {
@@ -40,47 +40,41 @@ AUTH_CONFIG = {
     "nickname_min_length": 2,
     "session_timeout": 24 * 60 * 60,
     "require_login": True,
-    "profile_fields": ["nox_id", "nickname", "department"],
+    "profile_fields": ["knox_id", "nickname", "department"],  # 문제 6 해결: knox_id → knox_id
     "departments": ["AE팀", "상품기획팀", "영업팀", "마케팅팀"],
 }
 
 # 🤖 통합 API 설정
 API_CONFIG = {
+    # === LLM API 통합 설정 ===
     "llm_api": {
-        "base_url": "",
-        "credential_key": "",
-        "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+        "base_url": "http://apigw-stg.samsungds.net:8000/gpt-oss/1/gpt-oss-120b/v1/chat/completions",
+        "credential_key": "credential:TICKET-4cede4fc-91e2-4d58-825a-4f84236e8674:ST0000102728-STG:a2iVmGXASSOqfrbyxApcHwRI-6YwWMQGS4GrVCrDbgyA:-1:YTJpVm1HWEFTU09xZnJieXhBcGNid1JsLTZZd1dNUUdTNEdyVkNyRGJneUE=:signature=qKzfxDYmm2QcQYhKbrx1PgwlVB0955IcUoJuL6yDFZBaAtwiTtwSqrYIW5IVQDV38suAkfO86T9X1fjTPf7rCj-xkdVmrqVk02NPbT08LeJ9F_5a7tXOF4A==",
+        "model": "openai/gpt-oss-120b",
         "headers": {
-            "Send-System-Name": "",
-            "User-Id": "",
+            "Send-System-Name": "AE_WIKI",
+            "User-Id": "minguk.kim",
             "User-Type": "AD_ID",
             "Accept": "text/event-stream; charset=utf-8",
             "Content-Type": "application/json"
         }
     },
+    # === RAG API 통합 설정 ===
     "rag_api_common": {
-        "base_url": "",
-        "credential_key": "",
-        "user": "",
+        "base_url": "http://apigw.samsungds.net:8000/ds_llm_rag/2/dsllmrag/elastic/v2/retrieve-rrf",
+        "credential_key": "credential:TICKET-1e55d984-3187-49f1-93b8-2ae3630d50d6:ST0000102728-null:gdlK0qYYQX6s_dZIKpT2mAIOKnGJn...",
+        "api-key": "rag-Q65t3yE.QadahMiyk4SrwJY-7JXq0DGhO7PbbHK9-GR8jn3yklYce_yaF04Y2Xsxj5-vUhihSatZKEpzFBWHvDd_YA75F5rTUx3WMgDx1hjY8IMhkiiZw-1hz9busw-nvxvscRNe",
+        "user": "minguk.kim",
         "auth_list": ["ds"],
         "num_candidates": 1000,
-        "num_result_doc": 3,
+        "num_result_doc": 5,
         "fields_exclude": ["v_merge_title_content"],
-        "timeout": 30,
-        # 날짜 기반 정렬 설정
-        "sort_by_date": True,
-        "date_field": "last_modified",  # 또는 "created_date", "updated_at" 등
-        "sort_order": "desc",  # desc: 최신순, asc: 오래된순
-        "date_weight": 0.3,  # 날짜 가중치 (0.0-1.0)
-        "relevance_weight": 0.7  # 유사도 가중치 (0.0-1.0)
+        "timeout": 45
     }
 }
 
 # 🧪 테스트 설정
 TEST_CONFIG = {
-    "enable_mock_mode": True,
-    "mock_response_delay": 0.5,
-    "show_mock_indicators": True,
     "detailed_source_info": True,
 }
 
@@ -114,7 +108,7 @@ CHATBOT_INDICES = {
         "display_name": "🧠 AE WIKI",
         "description": "AE팀 업무 전문 AI 어시스턴트",
         "subtitle": "AE팀 업무 프로세스 및 가이드라인",
-        "icon": "🧠",
+        "icon": " ",
         "color": "#667eea",
         "gradient": "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
 
@@ -155,7 +149,7 @@ CHATBOT_INDICES = {
         "display_name": "🔍 AE 용어집",
         "description": "반도체 AE 전문 용어 AI 어시스턴트",
         "subtitle": "반도체 AE 전문 용어 정의 및 설명",
-        "icon": "🔍",
+        "icon": "",
         "color": "#28a745",
         "gradient": "linear-gradient(90deg, #28a745 0%, #20c997 100%)",
 
@@ -197,7 +191,7 @@ CHATBOT_INDICES = {
         "display_name": "🤖 JEDEC SPEC",
         "description": "JEDEC 반도체 표준 문서 전용 AI 어시스턴트",
         "subtitle": "JEDEC 표준 규격 및 테스트 방법 문의",
-        "icon": "🤖",
+        "icon": "",
         "color": "#f59e0b",
         "gradient": "linear-gradient(90deg, #f59e0b 0%, #f97316 100%)",
 
@@ -238,7 +232,7 @@ JEDEC 표준과 관련된 궁금한 점이 있으시면 언제든 물어보세�
         "display_name": "🔬 품질관리",
         "description": "반도체 품질관리 전문 AI 어시스턴트",
         "subtitle": "품질 검사 및 불량 분석 전문 상담",
-        "icon": "🔬",
+        "icon": "",
         "color": "#dc2626",
         "gradient": "linear-gradient(90deg, #dc2626 0%, #ef4444 100%)",
 
@@ -280,7 +274,7 @@ JEDEC 표준과 관련된 궁금한 점이 있으시면 언제든 물어보세�
         "display_name": "⚡ 테스트엔지니어링",
         "description": "반도체 테스트 전문 AI 어시스턴트",
         "subtitle": "테스트 프로그램 및 장비 운영 전문 상담",
-        "icon": "⚡",
+        "icon": "",
         "color": "#7c3aed",
         "gradient": "linear-gradient(90deg, #7c3aed 0%, #8b5cf6 100%)",
 
@@ -318,7 +312,7 @@ JEDEC 표준과 관련된 궁금한 점이 있으시면 언제든 물어보세�
 }
 
 # 📝 질문 분류 카테고리
-CATEGORIES = ["일반", "기술", "학습", "생활", "취미", "기타"]
+CATEGORIES = ["기술", "행정", "기타"]
 
 # 🎛️ RAG 날짜 정렬 설정 관리 함수들
 def update_rag_date_sorting_config(sort_by_date: bool = True, date_field: str = "last_modified",

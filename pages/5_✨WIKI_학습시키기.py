@@ -1,6 +1,6 @@
 """
 =================================================================
-📄 AE WIKI - WIKI 학습시키기 페이지 (5_✨WIKI_학습시키기.py)
+📄 AE WIKI - 5_✨챗봇_학습시키기 페이지 (5_✨챗봇_학습시키기.py)
 =================================================================
 
 📋 파일 역할:
@@ -52,7 +52,7 @@ from config import get_available_indices, get_index_config
 # ====================================
 
 st.set_page_config(
-    page_title="✨WIKI 학습시키기",
+    page_title="✨ AI 챗봇 학습시키기",
     page_icon="✨",
     layout="centered"
 )
@@ -67,7 +67,7 @@ apply_dark_theme()
 
 def main():
     """
-    🎯 목적: WIKI 학습시키기 페이지의 메인 실행 함수
+    🎯 목적: 5_✨챗봇_학습시키기 페이지의 메인 실행 함수
     
     📊 입력: Streamlit 웹 요청
     📤 출력: 학습 기여 페이지 UI (탭 형태)
@@ -98,7 +98,7 @@ def main():
 
 def show_wiki_learning_page():
     """
-    🎯 목적: WIKI 학습시키기 메인 페이지 UI 렌더링 및 탭 구성
+    🎯 목적: 5_✨챗봇_학습시키기 메인 페이지 UI 렌더링 및 탭 구성
     
     📊 입력:
     - st.session_state.redirect_to_wiki_term (AE 용어집 챗봇에서 리다이렉트 시)
@@ -127,8 +127,8 @@ def show_wiki_learning_page():
     # 페이지 헤더
     st.markdown("""
     <div style="text-align: center; margin-bottom: 2rem;">
-        <h1>✨ WIKI 학습시키기</h1>
-        <p style="color: #888; font-size: 1.2rem;">새로운 지식을 AE WIKI에 추가해보세요!</p>
+        <h1>✨ AI 챗봇 학습시키기</h1>
+        <p style="color: #888; font-size: 1.2rem;">새로운 지식을 AI 챗봇에 추가해보세요!</p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -154,7 +154,7 @@ def show_wiki_learning_page():
     # default_tab = 0  # 미사용 변수 제거
     
     # 학습 방식 탭
-    learning_tab = st.tabs(["📝 용어 학습시키기", "📂 자료 링크 학습", "🚀 인덱스 추가요청하기"])
+    learning_tab = st.tabs(["📝 용어 학습시키기", "📂 자료 링크 학습", "🚀 챗봇 추가 요청하기"])
 
     # 리다이렉트된 경우 용어 학습 탭으로 포커스
     if redirect_type and redirect_type.startswith("term"):
@@ -180,7 +180,7 @@ def show_link_learning_section():
         <p style="margin-bottom: 0.5rem;">• <strong>URL 링크</strong>를 제출하면 관리자가 검토 후 WIKI에 학습시킵니다</p>
         <p style="margin-bottom: 0.5rem;">• 승인된 자료는 <strong>AE WIKI 챗봇</strong>과 <strong>용어집 챗봇</strong>의 답변에 활용됩니다</p>
         <p style="margin-bottom: 0.5rem;">• 반도체 기술 자료와 업무 관련 문서 모두 환영합니다!</p>
-        <p style="margin-bottom: 0; background: rgba(255,255,255,0.2); padding: 0.8rem; border-radius: 8px; font-weight: bold;">💰 학습 자료를 제공하면 <strong>100포인트</strong>를 획득할 수 있습니다!</p>
+        <p style="margin-bottom: 0; background: rgba(255,255,255,0.2); padding: 0.8rem; border-radius: 8px; font-weight: bold;">
     </div>
     """, unsafe_allow_html=True)
     
@@ -610,11 +610,11 @@ def show_index_request_section():
     st.markdown("""
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                padding: 2rem; border-radius: 15px; color: white; margin-bottom: 2rem;">
-        <h3 style="margin-bottom: 1rem;">🚀 새로운 인덱스 추가요청 시스템</h3>
+        <h3 style="margin-bottom: 1rem;">🚀 새로운 챗봇 추가요청 시스템</h3>
         <p style="margin-bottom: 0.5rem;">• <strong>새로운 전문 분야</strong>의 챗봇 인덱스를 요청할 수 있습니다</p>
         <p style="margin-bottom: 0.5rem;">• 승인된 인덱스는 <strong>통합 챗봇</strong>에 새로운 전문 분야로 추가됩니다</p>
         <p style="margin-bottom: 0.5rem;">• 요청 시 해당 분야의 RAG 데이터와 시스템 프롬프트가 함께 구성됩니다</p>
-        <p style="margin-bottom: 0; background: rgba(255,255,255,0.2); padding: 0.8rem; border-radius: 8px; font-weight: bold;">💰 인덱스 추가요청 시 <strong>200포인트</strong>를 획득할 수 있습니다!</p>
+        <p style="margin-bottom: 0; background: rgba(255,255,255,0.2); padding: 0.8rem; border-radius: 8px; font-weight: bold;">💰 인덱스 추가요청 시 <strong>포인트</strong>를 획득할 수 있습니다!</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -635,7 +635,7 @@ def show_index_request_section():
     with col2:
         display_name = st.text_input(
             "📋 표시명 *",
-            placeholder="예: ⚙️ 공정엔지니어링",
+            placeholder="예: 프로젝트명",
             key="index_request_display_name",
             help="통합 챗봇에서 표시될 이름 (이모지 포함 가능)"
         )
@@ -702,7 +702,7 @@ def show_index_request_section():
                     # 포인트 획득 알림
                     user = get_current_user()
                     if user:
-                        st.info(f"🎉 {user['nickname']}님이 200포인트를 획득하셨습니다!")
+                        st.info(f"🎉 {user['nickname']}님이 포인트를 획득하셨습니다!")
 
                     # 입력 필드 초기화
                     time.sleep(1)

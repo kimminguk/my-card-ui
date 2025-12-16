@@ -54,12 +54,12 @@ def show_voc_page():
     
     # 안내 메시지
     st.markdown("""
-    <div style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); 
+    <div style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
                padding: 2rem; border-radius: 15px; color: white; margin-bottom: 2rem;">
-        <h3 style="margin-bottom: 1rem;">🎯 여러분의 목소리가 AE WIKI를 더 좋게 만듭니다</h3>
-        <p style="margin-bottom: 0.5rem;">• 불편했던 점이나 개선했으면 하는 기능</p>
-        <p style="margin-bottom: 0.5rem;">• 새로 추가되었으면 하는 기능</p>
-        <p style="margin-bottom: 0;">• 사용 중 발견한 오류나 버그</p>
+        <h3 style="margin-bottom: 1rem; text-align: center;">🎯 여러분의 목소리가 AE PLUS를 더 좋게 만듭니다</h3>
+        <p style="margin-bottom: 0.5rem; text-align: center;">불편했던 점이나 개선했으면 하는 기능</p>
+        <p style="margin-bottom: 0.5rem; text-align: center;">새로 추가되었으면 하는 기능</p>
+        <p style="margin-bottom: 0; text-align: center;">사용 중 발견한 오류나 버그</p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -114,8 +114,8 @@ def show_voc_page():
     
     # 연락처 (선택)
     contact = st.text_input(
-        "📞 연락처 (선택)",
-        placeholder="답변이 필요한 경우 연락처를 입력해주세요",
+        "📧 이메일 (선택)",
+        placeholder="답변이 필요한 경우 이메일을 입력해주세요",
         key="voc_contact_input",
         help="피드백이 필요한 경우에만 입력해주세요"
     )
@@ -196,7 +196,7 @@ def save_voc_data(category, title, content, contact, anonymous):
         if not anonymous and user:
             from utils import add_user_points, initialize_data, save_data
             data = initialize_data()
-            username = user.get("nox_id") or user.get("username", "")
+            username = user.get("knox_id") or user.get("username", "")
             if username:
                 add_user_points(data, username, 50, "VOC 제출")
                 save_data(data)

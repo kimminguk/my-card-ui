@@ -110,7 +110,7 @@ def get_active_user(username: str) -> Optional[Dict[str, Any]]:
     Returns:
         Optional[Dict[str, Any]]: 사용자 정보 딕셔너리 또는 None
             - user_id: 고유 사용자 ID
-            - nox_id: NOX 아이디
+            - knox_id: NOX 아이디
             - nickname: 사용자 별명
             - name: 실명
             - department: 부서
@@ -205,7 +205,7 @@ def get_all_active_users() -> Dict[str, Dict[str, Any]]:
     data = load_users_data()  # 사용자 데이터 로드
     return data.get("active_users", {})  # 활성 사용자 딕셔너리 반환 (없으면 빈 딕셔너리)
 
-def add_registration_request(nox_id: str, name: str, department: str, password: str) -> Tuple[bool, str]:
+def add_registration_request(knox_id: str, name: str, department: str, password: str) -> Tuple[bool, str]:
     """
     📝 회원가입 신청 추가 함수
     
@@ -213,7 +213,7 @@ def add_registration_request(nox_id: str, name: str, department: str, password: 
     중복 확인, 비밀번호 해싱, 신청 정보 저장을 수행합니다.
     
     Args:
-        nox_id (str): 신청자의 NOX 아이디
+        knox_id (str): 신청자의 NOX 아이디
         name (str): 신청자의 실명
         department (str): 신청자의 소속 부서
         password (str): 평문 비밀번호
@@ -226,7 +226,7 @@ def add_registration_request(nox_id: str, name: str, department: str, password: 
     data = load_users_data()  # 현재 사용자 데이터 로드
     
     # 중복 확인 - users_management.json의 active_users
-    if nox_id in data.get("active_users", {}):  # 이미 활성 사용자로 등록된 경우
+    if knox_id in data.get("active_users", {}):  # 이미 활성 사용자로 등록된 경우
         return False, "이미 가입된 사용자입니다"  # 중복 가입 거부
     
     # 중복 확인 - knowledge_data.json의 approved_users (기존 시스템과의 호환성)
@@ -237,14 +237,14 @@ def add_registration_request(nox_id: str, name: str, department: str, password: 
         if os.path.exists(DATA_CONFIG["data_file"]):  # 기존 데이터 파일이 존재하면
             with open(DATA_CONFIG["data_file"], 'r', encoding='utf-8') as f:  # 파일 읽기
                 main_data = json.load(f)  # JSON 데이터 로드
-                if nox_id in main_data.get("approved_users", {}):  # 기존 승인 사용자에 존재하면
+                if knox_id in main_data.get("approved_users", {}):  # 기존 승인 사용자에 존재하면
                     return False, "이미 가입된 사용자입니다"  # 중복 가입 거부
     except Exception as e:  # 기존 데이터 확인 중 오류 발생 시
         logger.warning(f"approved_users 확인 중 오류: {e}")  # 경고 로깅 (치명적이지 않음)
     
     # 대기 중인 신청 확인
     for req in data.get("registration_requests", []):  # 모든 신청 목록 확인
-        if req.get("nox_id") == nox_id and req.get("status") == "pending":  # 동일 ID로 대기 중인 신청이 있으면
+        if req.get("knox_id") == knox_id and req.get("status") == "pending":  # 동일 ID로 대기 중인 신청이 있으면
             return False, "이미 가입 신청이 진행 중입니다"  # 중복 신청 거부
     
     # 비밀번호 해싱
@@ -258,7 +258,7 @@ def add_registration_request(nox_id: str, name: str, department: str, password: 
     request_id = str(uuid.uuid4())  # 고유한 신청 ID 생성
     new_request = {  # 새 신청 정보 구성
         "id": request_id,  # 고유 신청 ID
-        "nox_id": nox_id,  # 신청자 NOX ID
+        "knox_id": knox_id,  # 신청자 NOX ID
         "name": name,  # 신청자 실명
         "department": department,  # 소속 부서
         "password_hash": password_hash,  # 해싱된 비밀번호
@@ -341,7 +341,7 @@ def approve_registration_request(request_id: str, admin_username: str) -> Tuple[
     user_id = str(uuid.uuid4())  # 새로운 사용자 고유 ID 생성
     new_user = {  # 새 사용자 정보 구성
         "user_id": user_id,  # 고유 사용자 ID
-        "nox_id": request_to_approve["nox_id"],  # NOX 아이디
+        "knox_id": request_to_approve["knox_id"],  # NOX 아이디
         "nickname": request_to_approve["name"],  # 별명 (실명과 동일)
         "name": request_to_approve["name"],  # 실명
         "department": request_to_approve["department"],  # 소속 부서
@@ -354,7 +354,7 @@ def approve_registration_request(request_id: str, admin_username: str) -> Tuple[
         "approved_by": admin_username  # 승인한 관리자
     }
     
-    data["active_users"][request_to_approve["nox_id"]] = new_user  # 활성 사용자 목록에 추가
+    data["active_users"][request_to_approve["knox_id"]] = new_user  # 활성 사용자 목록에 추가
     
     # 신청 상태 업데이트
     request_to_approve["status"] = "approved"  # 상태를 승인으로 변경

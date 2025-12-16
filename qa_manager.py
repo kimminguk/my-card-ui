@@ -115,7 +115,7 @@ def add_question(data: Dict, title: str, category: str, content: str, anonymous:
         # 포인트 적립 (익명이 아닌 경우만)
         if not anonymous:
             from utils import add_user_points
-            username = user.get("nox_id") or user.get("username", "")
+            username = user.get("knox_id") or user.get("username", "")
             if username:
                 add_user_points(data, username, 100, "질문 작성")
                 logger.info(f"포인트 적립: {username} +100P (질문 작성)")
@@ -173,7 +173,7 @@ def add_answer(data: Dict, question_id: str, content: str) -> str:
 
         # 포인트 적립
         from utils import add_user_points
-        username = user.get("nox_id") or user.get("username", "")
+        username = user.get("knox_id") or user.get("username", "")
         if username:
             add_user_points(data, username, 100, "답변 작성")
             logger.info(f"포인트 적립: {username} +100P (답변 작성)")
@@ -231,12 +231,12 @@ def toggle_like(data: Dict, answer_id: str) -> bool:
             answer = next((a for a in data.get("answers", []) if a["id"] == answer_id), None)
             if answer:
                 answer_author_id = answer.get("author_id", "")
-                # 답변 작성자의 username(nox_id) 찾기
+                # 답변 작성자의 username(knox_id) 찾기
                 from utils import get_all_users
                 users = get_all_users()
                 answer_author = next((u for u in users if u.get("user_id") == answer_author_id), None)
                 if answer_author:
-                    answer_author_username = answer_author.get("nox_id") or answer_author.get("username", "")
+                    answer_author_username = answer_author.get("knox_id") or answer_author.get("username", "")
                     if answer_author_username:
                         from utils import add_user_points
                         add_user_points(data, answer_author_username, 10, "답변 좋아요 받음")
@@ -420,9 +420,9 @@ def submit_registration_request(username: str, name: str, department: str, passw
         # user_manager.py의 add_registration_request 함수 사용
         from user_manager import add_registration_request
 
-        # nox_id = username으로 전달 (Knox ID)
+        # knox_id = username으로 전달 (Knox ID)
         success, message = add_registration_request(
-            nox_id=username,
+            knox_id=username,
             name=name,
             department=department,
             password=password

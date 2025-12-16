@@ -35,7 +35,8 @@ import streamlit as st
 from config import APP_CONFIG
 from utils import (
     load_css_styles, require_login, get_current_user, logout_user, initialize_session_state,
-    initialize_data, get_user_points_ranking, check_session_validity
+    initialize_data, get_user_points_ranking, check_session_validity,
+    resolve_user_label
 )
 
 # ====================================
@@ -262,7 +263,7 @@ def show_quick_actions():
     - 호출 대상: get_current_user(), initialize_data()
     
     🎨 UI 이벤트:
-    - '질문 작성하기' 버튼 -> pages/6_📚_팀원에게_물어보기.py
+    - '질문 작성하기' 버튼 -> pages/6_📚_AE Help Desk.py
     - '활동 상세보기' 버튼 -> 사이드바 상세 활동 내역 펼치기
     - '용어 등록하기' 버튼 -> pages/5_✨WIKI_학습시키기.py
     - '포인트 상세' 버튼 -> 포인트 내역 팝업 표시
@@ -311,65 +312,20 @@ def show_quick_actions():
                        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
                        transition: transform 0.3s ease; margin-bottom: 1rem;">
                 <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🚀</div>
-                <h4 style="color: white; margin-bottom: 0.5rem;">빠른 질문하기</h4>
+                <h4 style="color: white; margin-bottom: 0.5rem;">📕 AE팀에게 질문하기</h4>
                 <p style="color: rgba(255,255,255,0.8); margin: 0; font-size: 0.9rem;">
-                    바로 질문을 작성하세요
+                    팀원에게 바로 질문을 작성하세요
                 </p>
             </div>
             """, unsafe_allow_html=True)
-            
+
             # 🎨 UI 이벤트: 질문 작성 버튼 클릭
             # 목적: 팀원에게 물어보기 페이지로 이동하여 질문 작성 화면 바로 표시
-            # 연결: st.switch_page() -> pages/6_📚_팀원에게_물어보기.py
+            # 연결: st.switch_page() -> pages/6_📕_AE팀에게 질문하기.py
             if st.button("질문 작성하기", key="quick_question", use_container_width=True):
-                st.switch_page("pages/6_📚_팀원에게_물어보기.py")
+                st.switch_page("pages/6_📚_AE Help Desk.py")
         
         with col2:
-            # 카드 2: 내 활동 현황 (초록색 그라데이션)
-            # 용도: 사용자 개인의 질문/답변 통계를 한눈에 보여주고, 상세 내역 펼치기
-            st.markdown(f"""
-            <div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); 
-                       padding: 1.5rem; border-radius: 15px; text-align: center; 
-                       box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
-                       transition: transform 0.3s ease; margin-bottom: 1rem;">
-                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📊</div>
-                <h4 style="color: white; margin-bottom: 0.5rem;">내 활동 현황</h4>
-                <p style="color: rgba(255,255,255,0.8); margin: 0; font-size: 0.9rem;">
-                    질문 {len(my_questions)}개 • 답변 {len(my_answers)}개
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # 🎨 UI 이벤트: 활동 상세보기 버튼 클릭
-            # 목적: 사이드바의 상세 활동 내역을 펼쳐서 보여줌
-            # 연결: st.session_state.show_detailed_activity = True -> 사이드바 show_user_activity_summary() 함수
-            # 부작용: st.rerun()으로 페이지 즉시 새로고침하여 사이드바 업데이트
-            if st.button("활동 상세보기", key="my_activities", use_container_width=True):
-                st.session_state.show_detailed_activity = True  # 사이드바 상세 활동 내역 플래그 활성화
-                st.rerun()  # 페이지 새로고침으로 사이드바 업데이트 즉시 반영
-        
-        with col3:
-            # 용어 추가하기  
-            st.markdown("""
-            <div style="background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%); 
-                       padding: 1.5rem; border-radius: 15px; text-align: center; 
-                       box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
-                       transition: transform 0.3s ease; margin-bottom: 1rem;">
-                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📝</div>
-                <h4 style="color: white; margin-bottom: 0.5rem;">용어 추가하기</h4>
-                <p style="color: rgba(255,255,255,0.8); margin: 0; font-size: 0.9rem;">
-                    새로운 용어를 등록하세요
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            if st.button("용어 등록하기", key="add_term", use_container_width=True):
-                st.switch_page("pages/5_✨WIKI_학습시키기.py")
-        
-        # 두 번째 줄
-        col4, col5, col6 = st.columns(3)
-        
-        with col4:
             # 포인트 현황
             total_points = len(my_questions) * 100 + len(my_answers) * 100
             st.markdown(f"""
@@ -397,25 +353,7 @@ def show_quick_actions():
                 💡 더 많은 활동으로 포인트를 모아보세요!
                 """)
         
-        with col5:
-            # AI 챗봇 허브
-            st.markdown("""
-            <div style="background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%); 
-                       padding: 1.5rem; border-radius: 15px; text-align: center; 
-                       box-shadow: 0 4px 15px rgba(111, 66, 193, 0.3);
-                       transition: transform 0.3s ease; margin-bottom: 1rem;">
-                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🤖</div>
-                <h4 style="color: white; margin-bottom: 0.5rem;">🤖 통합 AI 챗봇</h4>
-                <p style="color: rgba(255,255,255,0.8); margin: 0; font-size: 0.9rem;">
-                    하나의 인터페이스로 모든 전문 분야 접근
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            if st.button("통합 챗봇 시작", key="ai_hub", use_container_width=True):
-                st.switch_page("pages/2_🤖_통합_챗봇.py")
-        
-        with col6:
+        with col3:
             # 학습 요청 현황
             st.markdown("""
             <div style="background: linear-gradient(135deg, #17a2b8 0%, #6610f2 100%); 
@@ -423,7 +361,7 @@ def show_quick_actions():
                        box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3);
                        transition: transform 0.3s ease; margin-bottom: 1rem;">
                 <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📚</div>
-                <h4 style="color: white; margin-bottom: 0.5rem;">학습 자료 기여</h4>
+                <h4 style="color: white; margin-bottom: 0.5rem;">자료 학습시키기</h4>
                 <p style="color: rgba(255,255,255,0.8); margin: 0; font-size: 0.9rem;">
                     WIKI를 더 똑똑하게!
                 </p>
@@ -663,9 +601,9 @@ def show_recent_news():
                    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);">
             <h4 style="color: white; margin-bottom: 1rem; text-align: center;">🏆 Best Contributor에 도전하세요 🏆</h4>
             <div style="font-size: 0.95rem;">
-                <p style="margin: 0.5rem 0;"><strong>WIKI를 학습시켜주세요</strong> ✅ 학습하기 메뉴를 통해 지식을 등록해주세요 </p>
-                <p style="margin: 0.5rem 0;"><strong>질문하세요</strong> ✅ 궁금한 점은 질문 예시를 참고해 올려주세요</p>
-                <p style="margin: 0.5rem 0;"><strong>답변해주세요</strong> ✅ 팀원들의 질문에 자유롭게 답변을 남겨주세요</p>
+                <p style="margin: 0.5rem 0; text-align: center; "><strong></strong> </p>
+                <p style="margin: 0.5rem 0; text-align: center; "><strong>활동이 쌓일수록 포인트 UP!</strong></p>
+                <p style="margin: 0.5rem 0; text-align: center; "><strong></strong> </p>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -676,27 +614,22 @@ def show_recent_news():
         <div style="background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%); 
                    padding: 1.5rem; border-radius: 15px; color: white; margin-bottom: 1rem;
                    box-shadow: 0 4px 15px rgba(116, 185, 255, 0.3);">
-            <h4 style="color: white; margin-bottom: 1rem; text-align: center;">📋 이번 주 업데이트</h4>
+            <h4 style="color: white; margin-bottom: 1rem; text-align: center;">🎮 미션을 완료하고 포인트를 모아보세요!</h4>
             <div style="font-size: 0.9rem;">
-                <p style="margin: 0.4rem 0;">✅ <strong>AE WIKI 챗봇</strong> 새로운 AE 기술 DB 추가</p>
-                <p style="margin: 0.4rem 0;">✅ <strong>용어집 챗봇</strong> 신규 반도체 용어 150개</p>
-                <p style="margin: 0.4rem 0;">✅ <strong>검색 기능</strong> 속도 개선 및 정확도 향상</p>
-                <p style="margin: 0.4rem 0;">🔄 <strong>답변 품질 최적화</strong> 진행 중</p>
+                <p style="margin: 0.4rem 0; text-align: center; ">MISSION 1: 지식 등록하기</strong> 📚 당신의 노하우를 AE PLUS에 학습시켜주세요</p>
+                <p style="margin: 0.4rem 0; text-align: center; ">MISSION 2: 질문하기</strong>💬 궁금한 점을 팀원들에게 물어보세요</p>
+                <p style="margin: 0.4rem 0; text-align: center; ">MISSION 3: 답변하기</strong>✍️ 팀원들의 질문에 답변을 남겨주세요</p>
             </div>
         </div>
         """, unsafe_allow_html=True)
-    
-    # 시스템 공지사항 (전체 너비)
+
+        # 시스템 공지사항 (전체 너비)
     st.markdown("""
     <div style="background: linear-gradient(135deg, #00b894 0%, #00a085 100%); 
                padding: 1.5rem; border-radius: 15px; color: white; margin-bottom: 1.5rem;
                box-shadow: 0 4px 15px rgba(0, 184, 148, 0.3); text-align: center;">
-        <h4 style="color: white; margin-bottom: 1rem;">🎉 새로운 기능 출시!</h4>
         <p style="margin: 0.5rem 0; font-size: 1.1rem;">
-            <strong>🙏 여러분의 의견이 큰 힘이 됩니다. 혹시 불편함이 있더라도 양해 부탁드리며, 피드백은 언제나 환영합니다! </strong>  
-        </p>
-        <p style="margin: 0; font-size: 0.95rem; opacity: 0.9;">
-            반응형 디자인 적용으로 언제 어디서나 AE WIKI를 활용하세요 ✨
+            <strong>🙏 여러분의 의견이 큰 힘이 됩니다. 불편함이 있더라도 양해 부탁드리며, 피드백은 언제나 환영합니다! </strong>  
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -726,6 +659,8 @@ def show_hall_of_fame():
         ]
         
         for i, (username, points) in enumerate(ranking):
+            display_name = resolve_user_label(username)
+            # ⬅️ 핵심: ID → 닉네임/실명
             if i < 3:
                 with cols[i]:
                     # 포인트 기반 카드 형태로 표시
@@ -743,7 +678,7 @@ def show_hall_of_fame():
                             color: white;
                         ">
                             <div style="font-size: 3rem; margin-bottom: 0.5rem;">{medals[i]}</div>
-                            <h3 style="margin-bottom: 0.5rem; font-weight: bold;">{username}</h3>
+                            <h3 style="margin-bottom: 0.5rem; font-weight: bold;">{display_name}</h3>
                             <p style="margin: 0; font-size: 1.2rem; font-weight: 600;">
                                 {points:,} 포인트
                             </p>
@@ -827,7 +762,7 @@ def setup_sidebar():
             st.success(f"👋 **{user['nickname']}**님 환영합니다!")
             
             with st.expander("ℹ️ 내 정보", expanded=False):
-                st.markdown(f"**녹스아이디**: {user['nox_id']}")
+                st.markdown(f"**녹스아이디**: {user['knox_id']}")
                 st.markdown(f"**닉네임**: {user['nickname']}")
                 st.markdown(f"**소속부서**: {user['department']}")
                 if user.get('created_at'):
@@ -966,7 +901,7 @@ def show_home_dashboard():
     # 메인 헤더
     st.markdown("""
     <div style="text-align: center; margin-bottom: 3rem;">
-        <h1 style="color: #667eea; font-size: 3rem; margin-bottom: 0.5rem;">🧠 AE WIKI</h1>
+        <h1 style="color: #667eea; font-size: 3rem; margin-bottom: 0.5rem;">🧠 AE PLUS</h1>
         <p style="font-size: 1.5rem; color: #888; margin-bottom: 0.5rem;">Application Engineering Knowledge Hub</p>
         <p style="font-size: 1.1rem; color: #aaa;">AE 업무 지식의 모든 것</p>
     </div>
@@ -1000,7 +935,7 @@ def show_home_dashboard():
     st.markdown("---")
     st.markdown("""
     <div style="text-align: center; color: #888; padding: 2rem 0;">
-        <p><strong>AE WIKI</strong> - 함께 만들어가는 지식 공유 플랫폼</p>
+        <p><strong>AE PLUS</strong> - 함께 만들어가는 지식 공유 플랫폼</p>
         <p style="font-size: 0.9rem;">궁금한 점이나 개선사항이 있으시면 언제든 VOC를 통해 문의해주세요 🙂</p>
     </div>
     """, unsafe_allow_html=True)
