@@ -15,7 +15,6 @@ from utils import (
     initialize_data, is_logged_in, require_login,
     get_username, load_css_styles, get_all_users, search_users,
     toggle_user_status, delete_user, update_user_info,
-    get_pending_registration_requests, approve_registration_request, reject_registration_request,
     get_all_user_points, adjust_user_points, set_user_points, get_point_change_history,
     cleanup_duplicate_points_data
 )
