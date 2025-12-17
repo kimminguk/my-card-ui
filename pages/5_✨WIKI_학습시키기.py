@@ -43,7 +43,7 @@ from datetime import datetime
 
 from utils import (
     load_css_styles, require_login, get_current_user, initialize_session_state,
-    initialize_data, add_user_points
+    initialize_data, add_user_points, award_points
 )
 from config import get_available_indices, get_index_config
 
@@ -490,10 +490,15 @@ def save_learning_request(chatbot_name, index_id, url_link, title, description, 
         from utils import save_data
         data = initialize_data()  # 포인트 시스템 데이터 로드
         current_user = get_current_user()  # 현재 로그인한 사용자 정보 가져오기
-        username = current_user.get("username", "Unknown") if current_user else "Anonymous"
+        username = ""
+        if current_user:
+            username = (current_user.get("knox_id") or
+                current_user.get("username") or "").strip()
+        else:
+            logger.warning("포인트 지급 스킵: 사용자 knox_id 없음 (WIKI학습)")
         add_user_points(data, username, 100, "WIKI학습")  # 올바른 순서로 호출
         save_data(data)  # 포인트 데이터 저장
-        
+
         return True  # 저장 성공
         
     except Exception as e:
@@ -537,12 +542,15 @@ def save_term_learning_request(term_name, term_definition, additional_notes):
         
         # 용어 학습으로 100포인트 지급 (보안 강화)
         from utils import save_data
-        data = initialize_data()
-        current_user = get_current_user()  # 현재 로그인한 사용자 정보 가져오기
-        username = current_user.get("username", "Unknown") if current_user else "Anonymous"
-        add_user_points(data, username, 100, "용어학습")  # 올바른 순서로 호출
-        save_data(data)  # 포인트 데이터 저장
-        
+        current_user = get_current_user()
+
+        point_key = ""
+        if current_user:
+            point_key = (current_user.get("knox_id") or
+                current_user.get("username") or "").strip()
+        else:
+            logger.warning("포인트 지급 스킵: 사용자 knox_id/username 없음 (용어 학습)")
+
         return True
         
     except Exception as e:

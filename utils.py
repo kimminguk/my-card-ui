@@ -23,6 +23,7 @@ from utils import function_name  # 기존 방식 유지
 import os
 import sys
 import logging
+import streamlit as st
 
 # 로거 설정
 logger = logging.getLogger(__name__)
@@ -300,6 +301,32 @@ def get_chatbot_response(user_message: str, chat_history=None, user_id=None, sys
 # ====================================
 # 🔧 포인트 시스템 관리
 # ====================================
+def award_points(points: int, activity: str) -> bool:
+    """어디서 호출하든 안전하게 포인트 지급"""
+    data = initialize_data()        # data 스코프 문제 방지
+    key = get_points_key()           # Unknown 방지
+
+    if not key:
+        return False
+
+    add_user_points(data, key, points, activity)  # 내부에서 save_data()까지 함
+    return True
+
+def get_points_key() -> str:
+    """포인트 적립/조회에 사용할 유일한 키 = knox_id"""
+    user = get_current_user()
+
+    # 1) user dict 기반
+    if user:
+        key = (user.get("knox_id") or user.get("username") or "").strip()
+        if key:
+            return key
+
+    # 2) 세션 기반 fallback (auth_manager가 저장함)
+    key = (st.session_state.get("auth_knox_id") or
+           st.session_state.get("auth_user") or "").strip()
+    return key
+
 def add_user_points(data, username: str, points: int, activity_type: str) -> None:
     """사용자 포인트 추가"""
     try:
@@ -324,16 +351,8 @@ def get_user_points(data, username: str) -> int:
         return 0
 
 def get_current_user_points(data) -> int:
-    """현재 사용자 포인트 조회"""
-    try:
-        user = get_current_user()
-        if user:
-            username = user.get("username", "")
-            return get_user_points(data, username)
-        return 0
-    except Exception as e:
-        logger.error(f"현재 사용자 포인트 조회 실패: {e}")
-        return 0
+    key = get_points_key()
+    return data.get("user_points", {}).get(key, 0)
 
 def set_user_points(data, username: str, new_points: int, admin_user: str = None) -> bool:
     """사용자 포인트 설정 (관리자 기능)"""

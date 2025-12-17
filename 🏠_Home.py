@@ -323,7 +323,7 @@ def show_quick_actions():
             # 목적: 팀원에게 물어보기 페이지로 이동하여 질문 작성 화면 바로 표시
             # 연결: st.switch_page() -> pages/6_📕_AE팀에게 질문하기.py
             if st.button("질문 작성하기", key="quick_question", use_container_width=True):
-                st.switch_page("pages/6_📚_AE Help Desk.py")
+                st.switch_page("pages/6_📚_AE팀에게 질문하기.py")
         
         with col2:
             # 포인트 현황
@@ -891,7 +891,7 @@ def show_navigation_menu():
     for item in menu_items:
         if st.button(item['name'], key=f"nav_{item['key']}", use_container_width=True):
             if item["key"] == "home":
-                st.switch_page("🏠_Home.py")
+                st.rerun()  # 또는 pass
             else:
                 st.switch_page(item["page"])
 

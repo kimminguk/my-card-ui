@@ -16,7 +16,11 @@ from utils import (
     get_username, load_css_styles, get_all_users, search_users,
     toggle_user_status, delete_user, update_user_info,
     get_all_user_points, adjust_user_points, set_user_points, get_point_change_history,
-    cleanup_duplicate_points_data
+    cleanup_duplicate_points_data,
+    get_pending_registration_requests,
+    approve_registration_request,
+    reject_registration_request, resolve_user_label,
+    resolve_to_knox_id
 )
 # 새 통합 사용자 관리 시스템 import
 from user_manager import get_pending_requests, approve_registration_request as approve_new, reject_registration_request as reject_new
@@ -64,7 +68,7 @@ def require_admin():
         admin_password = st.text_input(
             "관리자 비밀번호", 
             type="password", 
-            placeholder="관리자 비밀번호를 입력하세요 (힌트: admin123)"
+            placeholder="관리자 비밀번호를 입력하세요"
         )
         login_button = st.form_submit_button("🚪 관리자로 로그인", type="primary")
         

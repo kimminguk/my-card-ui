@@ -184,66 +184,6 @@ def show_chat_interface(data):
     config = st.session_state.current_index_config
     index_id = st.session_state.selected_index
 
-    # 🔥 대화 이력 로드 (페이지 새로고침 시에도 유지)
-    # 세션 상태에 chat_history_loaded 플래그가 없거나 인덱스가 변경된 경우에만 로드
-    if ("chat_history_loaded" not in st.session_state or 
-        st.session_state.get("last_loaded_index") != index_id):
-        
-        # 저장된 대화 이력을 불러오기
-        try:
-            current_user = get_current_user()
-            if current_user:
-                user_id = current_user.get("user_id") or current_user.get("knox_id")
-                
-                # chat_history에서 현재 사용자 & 현재 챗봇의 최근 대화 가져오기
-                all_chats = data.get("chat_history", [])
-                user_chats_for_this_bot = [
-                    chat for chat in all_chats
-                    if (chat.get("user_id") == user_id and 
-                        chat.get("chatbot_type") == index_id)
-                ]
-                
-                # 최신 20개만 (너무 많으면 UI가 느려질 수 있음)
-                user_chats_for_this_bot.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
-                recent_chats = user_chats_for_this_bot[:20]
-                recent_chats.reverse()  # 오래된 것부터 표시하도록 다시 정렬
-                
-                # 세션 상태에 복원
-                if recent_chats:
-                    # 기존 환영 메시지는 유지하고 실제 대화만 추가
-                    welcome_messages = [
-                        msg for msg in st.session_state.unified_chat_messages
-                        if msg.get("role") == "assistant" and "환영" in msg.get("content", "")
-                    ]
-                    
-                    restored_messages = []
-                    for chat in recent_chats:
-                        # 사용자 메시지
-                        restored_messages.append({
-                            "role": "user",
-                            "content": chat.get("user_message", ""),
-                            "timestamp": chat.get("timestamp", "").split()[-1] if chat.get("timestamp") else "",
-                            "index_id": index_id
-                        })
-                        # 봇 응답
-                        restored_messages.append({
-                            "role": "assistant",
-                            "content": chat.get("bot_response", ""),
-                            "timestamp": chat.get("timestamp", "").split()[-1] if chat.get("timestamp") else "",
-                            "index_id": index_id
-                        })
-                    
-                    # 환영 메시지 + 복원된 대화
-                    st.session_state.unified_chat_messages = welcome_messages + restored_messages
-        
-        except Exception as e:
-            # 오류 발생 시 무시하고 계속 진행
-            pass
-        
-        # 로드 완료 표시
-        st.session_state.chat_history_loaded = True
-        st.session_state.last_loaded_index = index_id
-
     # 현재 선택된 인덱스 표시
     gradient = config.get("gradient", "linear-gradient(90deg, #667eea 0%, #764ba2 100%)")
     display_name = config.get("display_name", index_id)
@@ -347,8 +287,6 @@ def show_chat_interface(data):
         st.markdown("### 🔧 채팅 관리")
 
         if st.button("🗑️ 대화 기록 초기화", use_container_width=True):
-            st.session_state.unified_chat_messages = []
-            # 🔥 대화 이력 로드 플래그 초기화
             st.session_state.chat_history_loaded = False
             # 환영 메시지 다시 추가
             if st.session_state.selected_index:
@@ -368,8 +306,6 @@ def show_chat_interface(data):
             st.session_state.selected_index = None
             st.session_state.unified_chat_messages = []
             st.session_state.current_index_config = {}
-            # 🔥 대화 이력 로드 플래그 초기화
-            st.session_state.chat_history_loaded = False
             st.rerun()
 
         st.markdown("---")
