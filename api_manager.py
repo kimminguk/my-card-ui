@@ -102,7 +102,8 @@ def safe_get_nested(data, *path, default=None):
 # ========================================
 # Confluence 기본 URL
 # ========================================
-CONFLUENCE_BASE = "https://confluence.samsungds.net/spaces/AppEngineeringTeam/pages/"
+# Confluence 페이지 URL 형식: viewpage.action?pageId={doc_id}
+CONFLUENCE_BASE = "https://confluence.samsungds.net/pages/viewpage.action?pageId="
 
 def sanitize_llm_markdown(text: str) -> str:
     """LLM 응답 내 HTML 줄바꿈/경량 태그를 Markdown 친화적으로 정리"""
@@ -288,23 +289,9 @@ def _extract_llm_text(result, *, debug=False) -> str:
 
 
 # ========================================
-# 출처 포맷팅 함수
+# 출처 포맷팅 함수 (레거시 호환)
 # ========================================
-def format_source_citations(source_data: List[dict], chatbot_type: str = "ae_wiki") -> str:
-    """출처 정보를 마크다운 형식으로 포맷팅"""
-    if not source_data:
-        return ""
-    lines = []
-    for i, s in enumerate(source_data, 1):
-        t = s.get("title", f"문서_{i}")
-        u = s.get("source_url", "")
-        if not u and s.get("doc_id"):
-            u = f"{CONFLUENCE_BASE}{s['doc_id']}"
-        if u:
-            lines.append(f"{i}. [{t}]({u})")
-        else:
-            lines.append(f"{i}. {t}")
-    return "\n".join(lines)
+# 주석: 이 함수는 하단의 통합된 format_source_citations 함수로 대체되었습니다.
 
 
 # ========================================
@@ -340,6 +327,7 @@ def call_llm_api(
     - source_data 포함 (문제 3 해결)
     - 실제 에러 노출 (문제 5 해결)
     - 상세 디버깅 로그 (문제 7 해결)
+    - 한국 시간 컨텍스트 추가 (최신 문서 검색 지원)
     """
 
     debug_print("🚀 LLM API 호출 시작", {
@@ -352,11 +340,37 @@ def call_llm_api(
     })
 
     try:
-        # STEP 1: 시스템 프롬프트 설정
+        # 한국 시간 정보 생성
+        from datetime import datetime
+        import pytz
+
+        try:
+            # 한국 시간대 (KST)
+            kst = pytz.timezone('Asia/Seoul')
+            current_time_kst = datetime.now(kst)
+            korea_time_str = current_time_kst.strftime("%Y년 %m월 %d일 %H:%M:%S (한국시간)")
+            korea_date_str = current_time_kst.strftime("%Y년 %m월 %d일")
+        except:
+            # pytz가 없는 경우 기본 시간 사용
+            current_time = datetime.now()
+            korea_time_str = current_time.strftime("%Y년 %m월 %d일 %H:%M:%S")
+            korea_date_str = current_time.strftime("%Y년 %m월 %d일")
+
+        # STEP 1: 시스템 프롬프트 설정 (한국 시간 정보 추가)
         system_prompt = custom_system_prompt or get_index_system_prompt(chatbot_type)
-        debug_print("📝 시스템 프롬프트 로드", {
-            "prompt_length": len(system_prompt),
-            "prompt_preview": system_prompt[:150] + "..."
+
+        # 시스템 프롬프트에 한국 시간 정보 추가
+        system_prompt_with_time = f"""현재 시간: {korea_time_str}
+오늘 날짜: {korea_date_str}
+
+사용자가 "최근", "최신", "가장 최근" 등의 시간 관련 질문을 하면, 위의 현재 시간을 기준으로 판단하세요.
+
+{system_prompt}"""
+
+        debug_print("📝 시스템 프롬프트 로드 (한국 시간 포함)", {
+            "korea_time": korea_time_str,
+            "prompt_length": len(system_prompt_with_time),
+            "prompt_preview": system_prompt_with_time[:200] + "..."
         })
 
         # STEP 2: 검색된 문서들을 하나의 컨텍스트로 결합
@@ -382,10 +396,10 @@ def call_llm_api(
         # STEP 4: messages 배열 구성
         messages = []
 
-        # 시스템 프롬프트 추가
+        # 시스템 프롬프트 추가 (한국 시간 정보 포함)
         messages.append({
             "role": "system",
-            "content": system_prompt
+            "content": system_prompt_with_time
         })
 
         # 이전 대화 기록 추가
@@ -784,14 +798,14 @@ def call_rag_api_with_chatbot_type(user_message: str, chatbot_type: str) -> dict
 # ========================================
 def format_source_citations(source_data: List[dict], chatbot_type: str = "ae_wiki") -> str:
     """
-    🎯 목적: 챗봇별 출처 정보를 적절한 형식으로 포맷팅
+    🎯 목적: 챗봇별 출처 정보를 클릭 가능한 하이퍼링크 형식으로 포맷팅
 
     📊 입력:
-    - source_data: 출처 정보 리스트
+    - source_data: 출처 정보 리스트 (title, source_url, doc_id 등 포함)
     - chatbot_type: 챗봇 타입
 
     📤 출력:
-    - 포맷팅된 출처 인용 문자열
+    - 클릭 가능한 마크다운 링크 형식의 출처 인용 문자열
     """
     if not source_data:
         return ""
@@ -799,32 +813,38 @@ def format_source_citations(source_data: List[dict], chatbot_type: str = "ae_wik
     citations = []
 
     for i, source in enumerate(source_data, 1):
-        source_name = source.get("source", f"문서 {i}")
+        # 제목 추출
+        title = source.get("title", source.get("source", f"문서 {i}"))
 
-        if chatbot_type == "ae_wiki":
-            # Confluence URL 포함
-            if "confluence_url" in source:
-                citations.append(f"📄 **{source_name}** - [Confluence 링크]({source['confluence_url']})")
-            else:
-                citations.append(f"📄 **{source_name}**")
+        # URL 추출 (다양한 필드명 지원)
+        url = (source.get("source_url") or
+               source.get("url") or
+               source.get("confluence_url") or
+               source.get("doc_url") or
+               source.get("link") or "")
 
-        elif chatbot_type == "jedec":
-            # 페이지 정보 포함
-            page_info = source.get("page", "")
-            if page_info:
-                citations.append(f"📄 **{source_name}** ({page_info})")
-            else:
-                citations.append(f"📄 **{source_name}**")
+        # doc_id가 있고 URL이 없으면 Confluence URL 생성
+        if not url and source.get("doc_id"):
+            url = f"{CONFLUENCE_BASE}{source['doc_id']}"
 
+        # 날짜 정보 추출
+        last_modified = source.get("last_modified", "")
+
+        # 마크다운 링크 생성 (클릭 가능한 형식)
+        if url and url.strip():
+            # URL이 있으면 클릭 가능한 하이퍼링크로 표시
+            citation = f"{i}. [{title}]({url})"
+            if last_modified:
+                citation += f" (수정일: {last_modified})"
         else:
-            # 기본 형식
-            citations.append(f"📄 **{source_name}**")
+            # URL이 없으면 일반 텍스트로 표시
+            citation = f"{i}. {title}"
+            if last_modified:
+                citation += f" (수정일: {last_modified})"
 
-        # 날짜 정보 추가 (있는 경우)
-        if source.get("last_modified"):
-            citations[-1] += f" (수정일: {source['last_modified']})"
+        citations.append(citation)
 
     if citations:
-        return f"\n\n**📚 참고 자료:**\n" + "\n".join(citations)
+        return "\n\n**📚 참고 자료:**\n" + "\n".join(citations)
     else:
         return ""
